@@ -237,31 +237,111 @@ h1{font-size:clamp(24px,5vw,32px);letter-spacing:-.045em;line-height:1.1;margin:
       throw new Error(failures || 'Could not download the source app HTML.');
     }
   }
-  function prepareDocument(html, version) {
-    const base = CDN(version);
-    const baseTag = `<base href="${base}">`;
-    if (!/<head\b[^>]*>/i.test(html)) throw new Error('The source index.html is missing its head element.');
-    html = html.replace(/<head\b([^>]*)>/i, `<head$1>${baseTag}`);
-
-    // Deferred classic scripts download in parallel, but still execute in document order.
-    // This app's modules are ordered dependencies, so async is deliberately not used.
-    html = html.replace(/<script\b([^>]*\bsrc=["'][^"']+["'][^>]*)>/gi, (tag, attrs) =>
-      /\b(?:async|defer)\b/i.test(attrs) ? tag : `<script${attrs} defer>`);
-
-    // The monitor reports real stylesheet/script load events to the outer loader.
-    const monitor = `<script>(function(){
-      var seen=new WeakSet();
-      function send(type,name,message){try{parent.postMessage({__sukiLauncher:1,type:type,src:name||'',message:message||''},'*')}catch(_){}}
-      function label(el){var v=el.getAttribute('src')||el.getAttribute('href')||'asset';return v.split(/[?#]/)[0].replace(/^\\.\\//,'')}
-      function watch(el){if(!el||seen.has(el))return;seen.add(el);var name=label(el);send('asset-start',name);el.addEventListener('load',function(){send('asset-done',name)},{once:true});el.addEventListener('error',function(){send('asset-error',name,'Could not load '+name)},{once:true})}
-      function scan(node){if(!node)return;if(node.matches&&node.matches('script[src],link[rel~="stylesheet"][href]'))watch(node);if(node.querySelectorAll)node.querySelectorAll('script[src],link[rel~="stylesheet"][href]').forEach(watch)}
-      var obs=new MutationObserver(function(records){records.forEach(function(r){r.addedNodes.forEach(scan)})});
-      obs.observe(document.documentElement,{childList:true,subtree:true});scan(document);
-      window.addEventListener('error',function(e){if(e.target&&(e.target.tagName==='SCRIPT'||e.target.tagName==='LINK'))return;if(e.message)send('runtime-error','',String(e.message))},true);
-    })();<\/script>`;
-    html = html.replace(/<head\b[^>]*>/i, match => match + monitor);
-    return html;
+  function sourceAssetCandidates(reference, version) {
+    const ref = String(reference || '').trim();
+    if (/^https?:\/\//i.test(ref)) return [ref];
+    const path = normalizedAsset(ref);
+    const raw = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${version}/${path}`;
+    const cdn = CDN(version) + path;
+    // Fetch assets directly from the same raw-file service that serves index.html,
+    // with jsDelivr as a fallback. They are embedded after download, so the app
+    // no longer needs the browser to fetch dozens of external subresources.
+    return [raw, cdn];
   }
+
+  async function fetchSourceAsset(reference, version) {
+    const urls = sourceAssetCandidates(reference, version);
+    const attempts = urls.map(async url => {
+      const text = await fetchText(url, 12000);
+      const trimmed = text.trimStart();
+      if (/\.(?:css|js)(?:[?#].*)?$/i.test(reference) && /^(?:<!doctype\s+html|<html\b|<head\b|<body\b)/i.test(trimmed.slice(0, 200))) {
+        throw new Error(`The server returned HTML instead of ${reference}`);
+      }
+      if (/Couldn't find the requested file|Not found:/i.test(trimmed.slice(0, 300))) {
+        throw new Error(`File was not found: ${reference}`);
+      }
+      return text;
+    });
+    try { return await Promise.any(attempts); }
+    catch (err) {
+      const failures = err && err.errors ? err.errors.map(x => x && x.message).filter(Boolean).join(' | ') : '';
+      throw new Error(failures || `Could not download ${reference}`);
+    }
+  }
+
+  function makeCssUrlsAbsolute(cssText, path, version) {
+    const cssUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${version}/${normalizedAsset(path)}`;
+    // Since the stylesheet is inlined, resolve simple relative url(...) references
+    // against the stylesheet's original URL, not against the launcher's about:blank.
+    return cssText.replace(/url\(\s*(["']?)([^"'()]+?)\1\s*\)/gi, (whole, quote, rawValue) => {
+      const value = rawValue.trim();
+      if (!value || /^(?:data:|blob:|https?:|\/\/|#|var\()/i.test(value)) return whole;
+      try { return `url("${new URL(value, cssUrl).href.replace(/"/g, '%22')}")`; }
+      catch (_) { return whole; }
+    });
+  }
+
+  async function prepareDocument(html, version) {
+    const parsed = new DOMParser().parseFromString(html, 'text/html');
+    if (!parsed.head || !parsed.body) throw new Error('The source index.html is missing its head or body element.');
+
+    const baseHref = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${version}/`;
+    let base = parsed.querySelector('base');
+    if (!base) { base = parsed.createElement('base'); parsed.head.prepend(base); }
+    base.href = baseHref;
+
+    const resources = [
+      ...[...parsed.querySelectorAll('link[rel~="stylesheet"][href]')].map(node => ({node, type:'css', ref:node.getAttribute('href')})),
+      ...[...parsed.querySelectorAll('script[src]')].map(node => ({node, type:'js', ref:node.getAttribute('src')}))
+    ];
+    if (!resources.length) throw new Error('No CSS or JavaScript files were found in the source index.html.');
+
+    // Load all files in parallel, report real per-file progress, then inline them.
+    // Inline assets avoid failures from cross-origin subresources in about:blank,
+    // local-file previews, and sandboxed website launchers.
+    const results = await Promise.all(resources.map(async item => {
+      const path = normalizedAsset(item.ref);
+      const key = 'asset:' + path;
+      setRow(key, 'active', 'Downloading');
+      $('statusTitle').textContent = 'Downloading app files…';
+      $('statusText').textContent = `Downloading ${path} · ${$('fileStep').textContent}.`;
+      try {
+        let contents = await fetchSourceAsset(item.ref, version);
+        if (item.type === 'css') {
+          contents = makeCssUrlsAbsolute(contents, path, version).replace(/<\/style/gi, '<\\/style');
+          const style = parsed.createElement('style');
+          style.setAttribute('data-source-file', path);
+          style.textContent = contents;
+          item.node.replaceWith(style);
+        } else {
+          // Protect the HTML parser from a literal closing-script sequence inside JS.
+          contents = contents.replace(/<\/script/gi, '<\\/script');
+          item.node.removeAttribute('src');
+          item.node.removeAttribute('async');
+          item.node.removeAttribute('defer');
+          item.node.setAttribute('data-source-file', path);
+          item.node.textContent = contents;
+        }
+        setRow(key, 'done', 'Ready');
+        $('statusText').textContent = `Downloaded ${path} · ${$('assetCount').textContent}.`;
+        return {path, ok:true};
+      } catch (error) {
+        setRow(key, 'failed', 'Failed');
+        return {path, ok:false, error:error && error.message ? error.message : String(error)};
+      }
+    }));
+
+    const failures = results.filter(result => !result.ok);
+    if (failures.length) throw new Error('Could not download app file(s): ' + failures.map(result => `${result.path} (${result.error})`).join('; '));
+
+    // Install a lightweight runtime error reporter before the app scripts execute.
+    const monitor = parsed.createElement('script');
+    monitor.textContent = `(function(){function send(type,name,message){try{parent.postMessage({__sukiLauncher:1,type:type,src:name||'',message:message||''},'*')}catch(e){}}window.addEventListener('error',function(e){if(e.message)send('runtime-error','',String(e.message))},true);window.addEventListener('unhandledrejection',function(e){send('runtime-error','',String(e.reason&&e.reason.message||e.reason||'Unhandled promise rejection'))})})();`;
+    parsed.head.prepend(monitor);
+
+    return '<!doctype html>\n' + parsed.documentElement.outerHTML;
+  }
+
   function mountInFrame(source) {
     return new Promise((resolve, reject) => {
       frameErrors = [];
@@ -373,16 +453,19 @@ h1{font-size:clamp(24px,5vw,32px);letter-spacing:-.045em;line-height:1.1;margin:
       setRow('version', 'done', version === BRANCH ? 'Live branch' : 'Version found');
       setRow('index', 'done', 'Downloaded');
       setRow('boot', 'active', 'Waiting for files');
-      const nextSource = prepareDocument(html, version);
+      const nextSource = await prepareDocument(html, version);
       if (wasRunning) {
         note(isUpdate ? 'New source version found. Applying update…' : 'Refreshing app…', 8000);
         frame.classList.remove('ready');
         await sleep(180);
       } else {
-        status('Loading app files…', 'Starting styles and scripts in parallel, in the right execution order.', 20);
+        status('Starting app interface…', 'All source files are downloaded and embedded. Initializing the app.', 90);
       }
       await mountInFrame(nextSource);
       setRow('boot', 'done', 'Ready');
+      $('filePercent').textContent = '100%';
+      $('progress').style.width = '100%';
+      $('progress').parentElement.setAttribute('aria-valuenow', '100');
       // Give the last checklist step a brief moment to land before the splash fades.
       await sleep(Math.max(0, 520 - (Date.now() - spotlightStartedAt)));
       stopSpotlight();
