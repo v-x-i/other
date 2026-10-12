@@ -5,532 +5,116 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b13">
-<title>Suki's Multi Tools</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>">
+<title>Suki's Multi Tools — Auto-Updating Launcher</title>
 <style>
-:root{color-scheme:dark;--bg:#0d0b13;--panel:#17131f;--text:#f7f2ff;--muted:#b4a9c3;--line:#383044;--accent:#c084fc}
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
-#sourceFrame{position:fixed;inset:0;width:100%;height:100%;border:0;background:var(--bg);opacity:0;visibility:hidden;transition:opacity .38s cubic-bezier(.2,.7,.2,1),visibility 0s linear .38s;z-index:1}
-#sourceFrame.ready{opacity:1;visibility:visible;transition:opacity .38s cubic-bezier(.2,.7,.2,1),visibility 0s}
-#splash{position:fixed;inset:0;z-index:5;display:grid;place-items:center;padding:22px;background:radial-gradient(ellipse at 50% 0%,#332044 0%,#171020 36%,#0d0b13 76%);opacity:1;transform:translateY(0) scale(1);transition:opacity .34s ease,transform .34s ease,visibility 0s;}
-#splash.gone{opacity:0;transform:translateY(-5px) scale(.99);visibility:hidden;pointer-events:none;transition:opacity .34s ease,transform .34s ease,visibility 0s linear .34s}
-.panel{width:min(540px,100%);max-height:calc(100dvh - 28px);overflow:auto;padding:clamp(20px,4vw,32px);border:1px solid #463653;border-radius:24px;background:linear-gradient(145deg,#20182aee,#121019f5);box-shadow:0 25px 100px #0008;backdrop-filter:blur(16px)}
-.load-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:13px 2px 7px;color:#a99ab9;font-size:10px;font-weight:800;letter-spacing:.12em}.load-head span:last-child{letter-spacing:0;font-variant-numeric:tabular-nums;color:#dbc5ee}.asset-list{display:grid;gap:5px;max-height:170px;overflow:auto;padding:1px 4px 1px 1px;scrollbar-width:thin;scrollbar-color:#4e3c60 transparent}.asset-row{display:grid;grid-template-columns:17px minmax(0,1fr) auto;align-items:center;gap:8px;padding:6px 9px;min-height:29px;border:1px solid transparent;border-radius:9px;background:#0f0c15a8;color:#9d91aa;font-size:11px;transition:background .18s,border-color .18s,color .18s,transform .18s}.asset-row .asset-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.asset-row .asset-state{font-size:10px;color:#81748f;white-space:nowrap}.asset-row .asset-icon{display:grid;place-items:center;width:16px;height:16px;border-radius:50%;font-size:12px}.asset-row.active{background:#281936;border-color:#6d4785;color:#f5eaff;transform:translateX(2px)}.asset-row.spotlight{background:linear-gradient(100deg,#382047,#21172d);border-color:#b879f2;color:#fff;transform:translateX(4px) scale(1.008);box-shadow:0 0 0 1px #c084fc22,0 5px 18px #0003}.asset-row.spotlight .asset-icon{color:#e5bdff;filter:drop-shadow(0 0 5px #c084fc);animation:spotPulse .65s ease-in-out infinite}.asset-row.spotlight .asset-state{color:#e5bdff}.asset-row.active .asset-icon{color:#d5a0ff;animation:pulse .9s ease-in-out infinite}.asset-row.active .asset-state{color:#d5a0ff}.asset-row.done .asset-icon{background:#164432;color:#88f0bc}.asset-row.done .asset-state{color:#83dbaa}.asset-row.failed{background:#351922;border-color:#70303e;color:#ffdae0}.asset-row.failed .asset-icon,.asset-row.failed .asset-state{color:#ff9aa9}.asset-row.phase{background:#17121f}.asset-row .asset-icon{flex-shrink:0}.asset-list:empty{display:none}
-.brand{display:flex;align-items:center;gap:14px;margin-bottom:11px}.logo{width:55px;height:55px;display:grid;place-items:center;border-radius:17px;font-size:28px;background:linear-gradient(145deg,#422657,#24182f);border:1px solid #70478f;box-shadow:inset 0 1px #ffffff18}
-h1{font-size:clamp(24px,5vw,32px);letter-spacing:-.045em;line-height:1.1;margin:0}.tag{color:#c7b4d8;font-size:13px;margin-top:5px}.intro{color:var(--muted);margin:17px 0 21px}
-.status{padding:15px 16px;border:1px solid var(--line);background:#0c0a11b8;border-radius:15px}.status-title{display:flex;align-items:center;gap:9px;font-weight:750}.dot{width:8px;height:8px;border-radius:50%;background:#c084fc;box-shadow:0 0 15px #c084fc;animation:pulse 1.5s ease-in-out infinite}.status-text{font-size:13px;color:var(--muted);margin-top:5px;overflow-wrap:anywhere}.file-meter{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:15px;padding:10px 11px;border:1px solid #3c2e49;border-radius:11px;background:#100c17}.file-current{display:flex;flex-direction:column;gap:2px;min-width:0}.file-caption{font-size:9px;font-weight:850;letter-spacing:.14em;color:#a995ba}.file-name{font-size:13px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#f5eaff;max-width:300px}.file-name.file-swap{animation:fileSwap .22s cubic-bezier(.2,.7,.2,1)}.file-metrics{display:flex;align-items:baseline;gap:10px;flex-shrink:0;font-variant-numeric:tabular-nums}.file-step{font-size:12px;font-weight:750;color:#c5b0d8}.file-percent{font-size:18px;font-weight:850;letter-spacing:-.04em;color:#e0b5ff;min-width:42px;text-align:right}.bar{height:6px;margin-top:8px;border-radius:99px;background:#2d2435;overflow:hidden}.bar span{display:block;height:100%;width:0%;background:linear-gradient(90deg,#954ce8,#e0a7ff);border-radius:99px;transition:width .28s ease}
-.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px}button,.button{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 15px;border:1px solid transparent;border-radius:12px;background:linear-gradient(135deg,#d3a1ff,#b879f2);color:#1b1027;font:inherit;font-weight:750;text-decoration:none;cursor:pointer;transition:transform .18s ease,filter .18s ease,background .18s ease}button:hover,.button:hover{filter:brightness(1.08);transform:translateY(-1px)}button:active,.button:active{transform:translateY(0)}button.secondary,.button.secondary{background:#292231;color:#eee5fa;border-color:#40364b}button:disabled{opacity:.6;cursor:wait;transform:none}.hint{font-size:12px;color:#8e829d;margin:18px 0 0}.hint a{color:#cfa4ff;text-decoration:none}.hint a:hover{text-decoration:underline}.error{color:#ffc0c7;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:12px}.error[hidden]{display:none}
-#notice{position:fixed;right:14px;bottom:14px;z-index:8;max-width:min(390px,calc(100vw - 28px));padding:10px 14px;border:1px solid #4c3a5d;border-radius:12px;background:#17121fee;color:#e9dafa;box-shadow:0 8px 30px #0006;font-size:12px;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .22s ease,transform .22s ease}#notice.show{opacity:1;transform:translateY(0)}
-@keyframes fileSwap{from{opacity:.25;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}@keyframes pulse{0%,100%{opacity:.48;transform:scale(.84)}50%{opacity:1;transform:scale(1.08)}}@keyframes spotPulse{0%,100%{opacity:.7;transform:scale(.9)}50%{opacity:1;transform:scale(1.12)}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+:root{color-scheme:dark;--bg:#0c0911;--panel:#17111f;--text:#f7f2ff;--muted:#b5a8c5;--line:#3a2c49;--accent:#c084fc;--green:#86efac;--red:#fda4af}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}#app{position:fixed;inset:0;width:100%;height:100%;border:0;background:var(--bg);opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s}#app.ready{opacity:1;visibility:visible;transition:opacity .45s ease,visibility 0s}.splash{position:fixed;inset:0;z-index:3;display:grid;place-items:center;overflow:auto;padding:14px;background:radial-gradient(ellipse at 50% 0%,#342043 0%,#1a1223 43%,#0c0911 84%);transition:opacity .45s ease,transform .45s ease,visibility 0s}.splash.gone{opacity:0;transform:translateY(-8px) scale(.99);visibility:hidden;pointer-events:none;transition:opacity .45s ease,transform .45s ease,visibility 0s linear .45s}.panel{width:min(570px,100%);max-height:calc(100dvh - 24px);overflow:auto;padding:clamp(17px,4vw,27px);border:1px solid #4a365c;border-radius:22px;background:linear-gradient(145deg,#21172dee,#120e19f7);box-shadow:0 24px 100px #0009}.brand{display:flex;align-items:center;gap:12px}.logo{width:49px;height:49px;display:grid;place-items:center;flex-shrink:0;border-radius:15px;font-size:26px;background:linear-gradient(145deg,#422657,#24182f);border:1px solid #70478f}h1{font-size:clamp(23px,5vw,30px);letter-spacing:-.045em;line-height:1.1;margin:0}.tag{color:#c7b4d8;font-size:12px;margin-top:5px}.intro{color:var(--muted);font-size:13px;margin:15px 0 16px}.status{padding:14px;border:1px solid var(--line);background:#0c0a11b8;border-radius:15px}.status-title{display:flex;align-items:center;gap:9px;font-weight:760}.dot{width:8px;height:8px;flex-shrink:0;border-radius:50%;background:var(--accent);box-shadow:0 0 15px var(--accent);animation:pulse 1.35s ease-in-out infinite}.status-text{font-size:12px;color:var(--muted);margin-top:5px;overflow-wrap:anywhere}.meter{margin-top:13px;padding:11px;border:1px solid #3c2e49;border-radius:11px;background:#100c17}.meter-top{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}.caption{font-size:9px;font-weight:850;letter-spacing:.14em;color:#a995ba}.filename{font-size:13px;font-weight:800;color:#f5eaff;margin-top:3px;overflow-wrap:anywhere;max-width:360px}.count{font-size:12px;color:#d8b9fa;font-variant-numeric:tabular-nums;white-space:nowrap}.bar{height:7px;margin-top:9px;border-radius:99px;background:#2d2435;overflow:hidden}.bar span{display:block;width:0;height:100%;border-radius:99px;background:linear-gradient(90deg,#954ce8,#e0a7ff);transition:width .28s ease}.list-title{display:flex;justify-content:space-between;gap:10px;margin:13px 2px 6px;color:#aa98bb;font-size:9px;font-weight:850;letter-spacing:.13em}.files{list-style:none;margin:0;padding:0;max-height:185px;overflow:auto;scrollbar-width:thin;scrollbar-color:#5a426d #171020;border:1px solid #30243b;border-radius:10px;background:#0c0911a8}.files li{display:flex;align-items:center;gap:8px;min-height:29px;padding:5px 9px;border-bottom:1px solid #241b2d;font-size:11px;transition:background .2s, color .2s}.files li:last-child{border-bottom:0}.files li.active{background:#42275877;box-shadow:inset 3px 0 #c084fc;color:#fff}.files li.done .state{color:var(--green)}.files li.failed .state{color:var(--red)}.state{width:13px;flex-shrink:0;text-align:center;color:#91839f;font-weight:800}.path{flex:1;min-width:0;overflow-wrap:anywhere}.file-state{color:#9d90ac;text-align:right;white-space:nowrap}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}button,a.button{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 13px;border:1px solid transparent;border-radius:11px;background:linear-gradient(135deg,#d3a1ff,#b879f2);color:#1b1027;font:inherit;font-size:13px;font-weight:800;text-decoration:none;cursor:pointer}button:disabled{opacity:.6;cursor:wait}a.secondary{background:#292231;color:#eee5fa;border-color:#40364b}.error{display:none;margin-top:12px;padding:10px 11px;border:1px solid #70303e;border-radius:10px;background:#351922;color:#ffc0c7;font-size:12px;overflow-wrap:anywhere}.error.show{display:block}.hint{font-size:11px;color:#8e829d;margin:13px 2px 0}.hint a{color:#cfa4ff;text-decoration:none}.small{font-size:10px;color:#7f728e;margin-top:6px}@keyframes pulse{0%,100%{opacity:.45;transform:scale(.86)}50%{opacity:1;transform:scale(1.08)}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
-<iframe id="sourceFrame" title="Suki's Multi Tools App" referrerpolicy="no-referrer"></iframe>
-<div id="splash">
-  <section class="panel" aria-labelledby="title">
-    <div class="brand"><div class="logo">🧰</div><div><h1 id="title">Suki's Multi Tools</h1><div class="tag">Live source launcher</div></div></div>
-    <p class="intro">Connecting to the source repository and starting the real app. You don't need to download its separate files.</p>
-    <div class="status" role="status" aria-live="polite"><div class="status-title"><span class="dot" id="dot"></span><span id="statusTitle">Connecting to GitHub…</span></div><div class="status-text" id="statusText">Starting the source download and version check together.</div><div class="file-meter"><div class="file-current"><span class="file-caption">CURRENT FILE</span><span class="file-name" id="currentFile">index.html</span></div><div class="file-metrics"><span class="file-step" id="fileStep">1/11</span><span class="file-percent" id="filePercent">0%</span></div></div><div class="bar" role="progressbar" aria-label="Files loaded" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progress"></span></div><div class="load-head"><span>LIVE LOAD SEQUENCE</span><span id="assetCount">Preparing queue…</span></div><div class="asset-list" id="assetList"><div class="asset-row active" data-key="version"><span class="asset-icon">◌</span><span class="asset-name">Check source version</span><span class="asset-state">Working</span></div><div class="asset-row" data-key="index"><span class="asset-icon">○</span><span class="asset-name">Download index.html</span><span class="asset-state">Queued</span></div></div></div>
-    <div class="error" id="error" hidden></div>
-    <div class="actions"><button id="retry" type="button">↻ Try again</button><a class="button secondary" href="https://github.com/jace01b-web/Sukis-Multi-Tools-App" target="_blank" rel="noopener">Source repository ↗</a></div>
-    <p class="hint">Requires internet access. Updates are checked automatically while this tab is visible.</p>
-  </section>
-</div>
-<div id="notice" aria-live="polite"></div>
+<iframe id="app" title="Suki's Multi Tools App" allow="clipboard-read; clipboard-write; fullscreen" allowfullscreen></iframe>
+<div class="splash" id="splash"><section class="panel">
+  <div class="brand"><div class="logo">🧰</div><div><h1>Suki's Multi Tools</h1><div class="tag">Live source launcher · discovers the app's linked files</div></div></div>
+  <p class="intro">Downloads the current app layout from the source repository, discovers its CSS and JavaScript files, then runs the real app in an isolated frame. Changes are checked automatically.</p>
+  <div class="status"><div class="status-title"><span class="dot" id="dot"></span><span id="title">Connecting to source…</span></div><div class="status-text" id="detail">Fetching the latest index.html and discovering its linked files.</div>
+    <div class="meter"><div class="meter-top"><div><div class="caption">CURRENT FILE</div><div class="filename" id="file">index.html</div></div><div class="count" id="count">0/— · 0%</div></div><div class="bar"><span id="bar"></span></div></div>
+    <div class="list-title"><span>LIVE LOAD SEQUENCE</span><span id="readyCount">0 files ready</span></div><ul class="files" id="files"></ul>
+    <div class="error" id="error" role="status"></div>
+    <div class="actions"><button id="retry">↻ Try again</button><a class="button secondary" href="https://github.com/jace01b-web/Sukis-Multi-Tools-App" target="_blank" rel="noopener">Source repository ↗</a><a class="button secondary" href="https://cdn.jsdelivr.net/gh/jace01b-web/Sukis-Multi-Tools-App@main/index.html" target="_blank" rel="noopener">Open source app ↗</a></div>
+  </div>
+  <p class="hint">Internet required. This works by loading the real source HTML and letting the browser request its linked files from GitHub/CDN; it does not display the raw source as a text page.</p>
+</section></div>
 <script>
-(() => {
-  'use strict';
-  const OWNER = 'jace01b-web';
-  const REPO = 'Sukis-Multi-Tools-App';
-  const BRANCH = 'main';
-  const COMMIT_API = `https://api.github.com/repos/${OWNER}/${REPO}/commits/${BRANCH}`;
-  const CDN = version => `https://cdn.jsdelivr.net/gh/${OWNER}/${REPO}@${version}/`;
-  // GitHub's unauthenticated API is rate-limited; keep background checks close to once a minute.
-  const CHECK_MS = 65000;
-  const EXPECTED_ASSETS = ['css/style.css','js/core.js','js/tools-text.js','js/tools-dev.js','js/calc-engine.js','js/tools-calc-adv.js','js/tools-calc.js','js/tools-life.js','js/themes.js','js/app.js'];
-  const $ = id => document.getElementById(id);
-  const frame = $('sourceFrame');
-  let currentVersion = null;
-  let currentSource = null;
-  let busy = false;
-  let lastCheckAt = 0;
-  let noticeTimer = null;
-  let frameErrors = [];
-  let lateCommitSha = null;
-  let spotlightTimer = null;
-  let spotlightIndex = 0;
-  let spotlightStartedAt = 0;
-
-  function status(title, message, progress) {
-    $('statusTitle').textContent = title;
-    $('statusText').textContent = message;
-    // Progress is driven by completed file loads, not an arbitrary timer.
+(function(){
+'use strict';
+var OWNER='jace01b-web', REPO='Sukis-Multi-Tools-App', BRANCH='main';
+var RAW_BASE='https://raw.githubusercontent.com/'+OWNER+'/'+REPO+'/refs/heads/'+BRANCH+'/';
+var RAW_URL=RAW_BASE+'index.html';
+var CDN_BASE='https://cdn.jsdelivr.net/gh/'+OWNER+'/'+REPO+'@'+BRANCH+'/';
+var COMMIT_API='https://api.github.com/repos/'+OWNER+'/'+REPO+'/commits/'+BRANCH;
+var POLL_FILE_MS=30000, POLL_COMMIT_MS=120000;
+var frame=document.getElementById('app'), splash=document.getElementById('splash'), title=document.getElementById('title'), detail=document.getElementById('detail'), fileEl=document.getElementById('file'), countEl=document.getElementById('count'), bar=document.getElementById('bar'), listEl=document.getElementById('files'), readyEl=document.getElementById('readyCount'), errorEl=document.getElementById('error'), retry=document.getElementById('retry'), dot=document.getElementById('dot');
+var currentHash=null,currentSha=null,currentToken='',currentHtml='',resourceItems=[],allItems=[],loading=false,loadAgain=false,revealed=false,attemptNo=0,activeStrategy=0,activeBase=0,frameViolations=0,currentBlobUrl=null,timeoutId=0,finishTimer=0,assetFallbackTried=false,assetEventCount=0;
+var STRATEGIES=['blob','srcdoc','write'];
+window.addEventListener('securitypolicyviolation',function(e){var d=e.effectiveDirective||e.violatedDirective||'';if(/^(frame|child)-src/.test(d))frameViolations++;});
+function setError(message){errorEl.textContent=message;errorEl.classList.add('show');}
+function clearError(){errorEl.textContent='';errorEl.classList.remove('show');}
+function updateProgress(){
+  var total=allItems.length||1,done=allItems.filter(function(x){return x.status==='done'||x.status==='failed';}).length;
+  var ready=allItems.filter(function(x){return x.status==='done';}).length;
+  var percent=Math.round(done/total*100); var active=allItems.find(function(x){return x.status==='loading';})||allItems.find(function(x){return x.status==='pending';})||allItems[allItems.length-1];
+  if(active)fileEl.textContent=active.path;
+  countEl.textContent=done+'/'+total+' · '+percent+'%';bar.style.width=percent+'%';readyEl.textContent=ready+'/'+total+' files ready';
+  allItems.forEach(function(x){var li=document.getElementById('file-'+x.id);if(!li)return;li.className=(x===active?'active ':'')+(x.status==='done'?'done':x.status==='failed'?'failed':'');var state=li.querySelector('.state'),st=li.querySelector('.file-state');state.textContent=x.status==='done'?'✓':x.status==='failed'?'!':x.status==='loading'?'◌':'·';st.textContent=x.status==='done'?'Loaded':x.status==='failed'?'Failed':x.status==='loading'?'Loading…':'Waiting';});
+  if(active){var activeLi=document.getElementById('file-'+active.id);if(activeLi&&active===allItems.find(function(x){return x.status==='loading';}))activeLi.scrollIntoView({block:'nearest',behavior:'smooth'});}
+}
+function setStatus(head,sub){title.textContent=head;detail.textContent=sub;}
+function renderList(){listEl.innerHTML='';allItems.forEach(function(x){var li=document.createElement('li');li.id='file-'+x.id;li.innerHTML='<span class="state">·</span><span class="path"></span><span class="file-state">Waiting</span>';li.querySelector('.path').textContent=x.path;listEl.appendChild(li);});updateProgress();}
+function fetchText(url){var sep=url.indexOf('?')<0?'?':'&';return fetch(url+sep+'_launcher='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status+' from '+new URL(url).host);return r.text();});}
+function getText(){return fetchText(RAW_URL).catch(function(first){return fetchText(CDN_BASE+'index.html').catch(function(second){throw new Error('Could not download source index.html. GitHub Raw: '+first.message+'; CDN: '+second.message);});});}
+function cleanPath(raw){try{if(!/^[a-z]+:/i.test(raw)&&raw.indexOf('//')!==0)return decodeURIComponent(raw.split('?')[0].split('#')[0]);var u=new URL(raw,RAW_BASE),p=u.pathname;var marker='/'+REPO+'/';var i=p.indexOf(marker);if(i>=0){p=p.slice(i+marker.length);p=p.replace(/^refs\/heads\/[^/]+\//,'');}return decodeURIComponent(p||raw);}catch(e){return raw;}}
+function isTracked(el){if(el.tagName==='LINK'){var rel=(el.getAttribute('rel')||'').toLowerCase().split(/\s+/);return rel.indexOf('stylesheet')>=0||rel.indexOf('modulepreload')>=0||rel.indexOf('preload')>=0;}if(el.tagName==='SCRIPT')return !!el.getAttribute('src');return false;}
+function assetUrlFor(el,base,version){var attr=el.tagName==='LINK'?'href':'src';var raw=el.getAttribute(attr);var u=new URL(raw,base);if(u.origin===new URL(base).origin)u.searchParams.set('_suki_v',version);return u.href;}
+function buildDocument(html,base,token,version){
+  var doc=new DOMParser().parseFromString(html,'text/html');
+  var baseTag=doc.createElement('base');baseTag.href=base;
+  if(doc.head)doc.head.insertBefore(baseTag,doc.head.firstChild);else{var h=doc.createElement('head');h.appendChild(baseTag);doc.documentElement.insertBefore(h,doc.body||null);}
+  var nodes=Array.prototype.slice.call(doc.querySelectorAll('link[href],script[src]')).filter(isTracked);
+  resourceItems=[];allItems=[{id:0,path:'index.html',status:'done',kind:'html'}];
+  nodes.forEach(function(el,i){var attr=el.tagName==='LINK'?'href':'src';var original=el.getAttribute(attr);var path=cleanPath(original);var item={id:i+1,path:path,status:'pending',kind:el.tagName==='LINK'?'css':'js'};resourceItems.push(item);allItems.push(item);el.setAttribute('data-suki-file',path);el.setAttribute('data-suki-token',token);el.setAttribute(attr,assetUrlFor(el,base,version));});
+  var monitor="(function(){var T="+JSON.stringify(token)+";function send(p,s){try{parent.postMessage({__sukiAssetTracker:T,path:p,status:s},'*')}catch(e){}}function hit(e){var n=e.target;if(!n||!n.getAttribute)return;var p=n.getAttribute('data-suki-file'),t=n.getAttribute('data-suki-token');if(p&&t===T)send(p,e.type==='error'?'failed':'done')}document.addEventListener('load',hit,true);document.addEventListener('error',hit,true);})();";
+  var bridge=doc.createElement('script');bridge.setAttribute('data-suki-bridge','1');bridge.textContent=monitor;
+  if(doc.head)doc.head.insertBefore(bridge,baseTag.nextSibling);else doc.documentElement.insertBefore(bridge,doc.documentElement.firstChild);
+  // The app's ordinary inline code and external file tags remain intact; this only adds tracking metadata.
+  return '<!doctype html>\n'+doc.documentElement.outerHTML;
+}
+function setResourceStatus(path,status,token){if(token!==currentToken)return;var item=resourceItems.find(function(x){return x.path===path;});if(!item)return;if(item.status==='done'||item.status==='failed')return;item.status=status;assetEventCount++;updateProgress();}
+window.addEventListener('message',function(e){var d=e.data;if(!d||!d.__sukiAssetTracker||d.__sukiAssetTracker!==currentToken)return;if(d.path&&d.status)setResourceStatus(d.path,d.status,d.__sukiAssetTracker);});
+function resetAssetStatuses(){allItems.forEach(function(x){if(x.kind!=='html')x.status='pending';});updateProgress();}
+function beginRender(html,baseIndex,strategyIndex){
+  clearTimeout(timeoutId);clearTimeout(finishTimer);activeBase=baseIndex;activeStrategy=strategyIndex;attemptNo++;var token='suki-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);currentToken=token;var base=baseIndex===0?RAW_BASE:CDN_BASE;var prepared;
+  assetEventCount=0;resetAssetStatuses();
+  try{prepared=buildDocument(html,base,token,(currentSha||Date.now().toString()));renderList();}catch(err){setStatus('Could not prepare app','Could not parse the source HTML.');setError(err.message);retry.disabled=false;return;}
+  // Only one source document should be active at a time. If a render method is blocked, try the next supported method.
+  var strategy=STRATEGIES[strategyIndex];var previousBlob=currentBlobUrl;var blobUrl=null;var wrote=false;var violationsAtStart=frameViolations;var renderDone=false;
+  setStatus('Loading app files…','Found '+resourceItems.length+' linked CSS/JavaScript files. Downloading them through the app frame.');fileEl.textContent='index.html';updateProgress();
+  function verify(){if(renderDone)return;renderDone=true;clearTimeout(timeoutId);setTimeout(function(){if(token!==currentToken)return;var blocked=frameViolations>violationsAtStart;var browserError=false;try{var href=frame.contentWindow.location.href;if(/^chrome-error:/i.test(href))browserError=true;}catch(e){/* opaque origins are expected on some hosted builders */}
+    if(!blocked&&!browserError){if(previousBlob&&previousBlob!==blobUrl)try{URL.revokeObjectURL(previousBlob);}catch(e){}currentBlobUrl=blobUrl;activeStrategy=strategyIndex;finishFrameLoad(token);return;}
+    if(blobUrl)try{URL.revokeObjectURL(blobUrl);}catch(e){}tryNextStrategy(html,baseIndex,strategyIndex+1);
+  },180);}
+  frame.onload=verify;
+  if(strategy==='blob'){
+    try{blobUrl=URL.createObjectURL(new Blob([prepared],{type:'text/html'}));frame.removeAttribute('srcdoc');frame.src=blobUrl;currentBlobUrl=blobUrl;}
+    catch(e){tryNextStrategy(html,baseIndex,strategyIndex+1);return;}
+  }else if(strategy==='srcdoc'){
+    try{frame.removeAttribute('src');frame.srcdoc=prepared;}catch(e){tryNextStrategy(html,baseIndex,strategyIndex+1);return;}
+  }else{
+    frame.removeAttribute('srcdoc');frame.onload=function(){if(!wrote){wrote=true;try{var d=frame.contentDocument;d.open();d.write(prepared);d.close();}catch(e){verify();}return;}verify();};frame.src='about:blank';timeoutId=setTimeout(function(){if(!wrote)verify();},1600);
   }
-  function normalizedAsset(value) {
-    return String(value || '').split(/[?#]/, 1)[0].replace(/^\.\//, '').replace(/^\//, '');
-  }
-  function rowFor(key) { return [...$('assetList').querySelectorAll('.asset-row')].find(row => row.dataset.key === key); }
-  function setRow(key, state, detail) {
-    const row = rowFor(key);
-    if (!row) return;
-    row.classList.remove('active','done','failed');
-    if (state === 'active') row.classList.add('active');
-    if (state === 'done') row.classList.add('done');
-    if (state === 'failed') row.classList.add('failed');
-    const icon = row.querySelector('.asset-icon');
-    const stateLabel = row.querySelector('.asset-state');
-    icon.textContent = state === 'done' ? '✓' : state === 'failed' ? '!' : state === 'active' ? '◌' : '○';
-    stateLabel.textContent = detail || (state === 'done' ? 'Ready' : state === 'failed' ? 'Failed' : state === 'active' ? 'Loading' : 'Queued');
-    updateQueueProgress();
-  }
-  function renderAssetQueue(paths) {
-    const list = $('assetList');
-    list.replaceChildren();
-    const add = (key, label, phase = false) => {
-      const row = document.createElement('div');
-      row.className = 'asset-row' + (phase ? ' phase' : '');
-      row.dataset.key = key;
-      const icon = document.createElement('span'); icon.className = 'asset-icon'; icon.textContent = '○';
-      const name = document.createElement('span'); name.className = 'asset-name'; name.textContent = label;
-      const state = document.createElement('span'); state.className = 'asset-state'; state.textContent = 'Queued';
-      row.append(icon, name, state); list.append(row);
-    };
-    add('version', 'Check source version', true);
-    add('index', 'index.html — app layout', true);
-    (paths.length ? paths : EXPECTED_ASSETS).forEach(path => add('asset:' + normalizedAsset(path), path));
-    add('boot', 'Initialize app interface', true);
-    $('assetCount').textContent = `0/${paths.length + 1} files ready`;
-    // Highlight the real file currently being loaded; don't animate through files that aren't loading.
-    spotlightStartedAt = Date.now();
-    stopSpotlight();
-    setRow('version', 'active', 'Checking');
-    setRow('index', 'active', 'Fetching');
-    updateFileMeter('index');
-  }
-  function stopSpotlight() {
-    if (spotlightTimer) clearInterval(spotlightTimer);
-    spotlightTimer = null;
-    $('assetList').querySelectorAll('.asset-row.spotlight').forEach(row => row.classList.remove('spotlight'));
-  }
-  function spotlightNext() {
-    // The active file is highlighted from real load events, not a fake timed sequence.
-    return;
-  }
-  function startSpotlight() {
-    stopSpotlight();
-    spotlightStartedAt = Date.now();
-  }
-
-  function updateFileMeter() {
-    const rows = [...$('assetList').querySelectorAll('.asset-row')];
-    // Version check and app boot aren't files: count index.html plus every stylesheet/script.
-    const fileRows = rows.filter(row => row.dataset.key === 'index' || row.dataset.key.startsWith('asset:'));
-    if (!fileRows.length) return;
-    // If several files download in parallel, feature the first active file in dependency order.
-    // Once it completes, the display advances naturally to the next active/pending file.
-    let currentRow = fileRows.find(row => row.classList.contains('active'));
-    if (!currentRow) currentRow = fileRows.find(row => !row.classList.contains('done') && !row.classList.contains('failed'));
-    if (!currentRow) currentRow = [...fileRows].reverse().find(row => row.classList.contains('done')) || fileRows[0];
-    const total = fileRows.length;
-    const position = fileRows.indexOf(currentRow) + 1;
-    const done = fileRows.filter(row => row.classList.contains('done')).length;
-    // Cross-origin downloads don't expose byte-level progress, so this is honest file-count progress.
-    const percent = Math.round(done / total * 100);
-    const nameEl = $('currentFile');
-    const key = currentRow.dataset.key;
-    const nextName = key === 'index' ? 'index.html' : key.slice('asset:'.length);
-    if (nameEl.textContent !== nextName) {
-      nameEl.textContent = nextName;
-      nameEl.classList.remove('file-swap');
-      void nameEl.offsetWidth;
-      nameEl.classList.add('file-swap');
-    }
-    nameEl.title = nameEl.textContent;
-    $('fileStep').textContent = `${position}/${total}`;
-    $('filePercent').textContent = `${percent}%`;
-    $('progress').style.width = `${percent}%`;
-    $('progress').parentElement.setAttribute('aria-valuenow', String(percent));
-    $('assetCount').textContent = `${done}/${total} files ready`;
-  }
-
-  function updateQueueProgress() {
-    updateFileMeter();
-  }
-
-  function sourceAssetPaths(html) {
-    const paths = [];
-    for (const tag of html.matchAll(/<link\b[^>]*>/gi)) {
-      if (!/rel=["']stylesheet["']/i.test(tag[0])) continue;
-      const match = tag[0].match(/href=["']([^"']+)["']/i);
-      if (match) paths.push(normalizedAsset(match[1]));
-    }
-    for (const tag of html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)) paths.push(normalizedAsset(tag[1]));
-    return [...new Set(paths)];
-  }
-
-  function showError(message) {
-    $('error').hidden = false;
-    $('error').textContent = message;
-    $('dot').style.background = '#fb7185';
-    $('dot').style.boxShadow = '0 0 15px #fb7185';
-  }
-  function clearError() {
-    $('error').hidden = true;
-    $('error').textContent = '';
-    $('dot').style.background = '#c084fc';
-    $('dot').style.boxShadow = '0 0 15px #c084fc';
-  }
-  function note(message, duration = 3200) {
-    $('notice').textContent = message;
-    $('notice').classList.add('show');
-    clearTimeout(noticeTimer);
-    noticeTimer = setTimeout(() => $('notice').classList.remove('show'), duration);
-  }
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-  async function fetchText(url, timeoutMs = 18000) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const response = await fetch(url, {cache:'no-store', signal:controller.signal, headers:{'Accept':'text/html,application/json;q=0.9,*/*;q=0.8'}});
-      if (!response.ok) throw new Error(`Request failed (${response.status}) for ${url}`);
-      return await response.text();
-    } finally { clearTimeout(timer); }
-  }
-  async function latestCommit() {
-    lastCheckAt = Date.now();
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 9000);
-    try {
-      // Avoid custom headers here: a preflight can fail in some file:// browser contexts.
-      const response = await fetch(COMMIT_API, {
-        cache: 'no-store', signal: controller.signal,
-        headers: { 'Accept': 'application/vnd.github+json' }
-      });
-      if (!response.ok) {
-        const extra = response.status === 403 || response.status === 429 ? ' GitHub may be rate limiting requests.' : '';
-        throw new Error(`GitHub version check failed (${response.status}).${extra}`);
-      }
-      const data = await response.json();
-      if (!data.sha) throw new Error('GitHub did not return a latest commit ID.');
-      return data.sha;
-    } finally { clearTimeout(timer); }
-  }
-  async function getSourceHtml(version) {
-    const urls = [
-      CDN(version) + 'index.html',
-      `https://raw.githubusercontent.com/${OWNER}/${REPO}/${version}/index.html`
-    ];
-    const attempts = urls.map(async url => {
-      const html = await fetchText(url, 12000);
-      if (!/<html[\s>]/i.test(html) || !/id=["']stage["']/.test(html) || !/<script\b[^>]*\bsrc=/i.test(html)) {
-        throw new Error('The source index.html did not contain the app layout and script references.');
-      }
-      return html;
-    });
-    try {
-      // Race CDN and raw GitHub: use whichever endpoint responds first rather than waiting on a dead mirror.
-      return await Promise.any(attempts);
-    } catch (err) {
-      const failures = err && err.errors ? err.errors.map(x => x && x.message).filter(Boolean).join('\n') : '';
-      throw new Error(failures || 'Could not download the source app HTML.');
-    }
-  }
-  function sourceAssetCandidates(reference, version) {
-    const ref = String(reference || '').trim();
-    if (/^https?:\/\//i.test(ref)) return [ref];
-    const path = normalizedAsset(ref);
-    const raw = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${version}/${path}`;
-    const cdn = CDN(version) + path;
-    // Fetch assets directly from the same raw-file service that serves index.html,
-    // with jsDelivr as a fallback. They are embedded after download, so the app
-    // no longer needs the browser to fetch dozens of external subresources.
-    return [raw, cdn];
-  }
-
-  async function fetchSourceAsset(reference, version) {
-    const urls = sourceAssetCandidates(reference, version);
-    const attempts = urls.map(async url => {
-      const text = await fetchText(url, 12000);
-      const trimmed = text.trimStart();
-      if (/\.(?:css|js)(?:[?#].*)?$/i.test(reference) && /^(?:<!doctype\s+html|<html\b|<head\b|<body\b)/i.test(trimmed.slice(0, 200))) {
-        throw new Error(`The server returned HTML instead of ${reference}`);
-      }
-      if (/Couldn't find the requested file|Not found:/i.test(trimmed.slice(0, 300))) {
-        throw new Error(`File was not found: ${reference}`);
-      }
-      return text;
-    });
-    try { return await Promise.any(attempts); }
-    catch (err) {
-      const failures = err && err.errors ? err.errors.map(x => x && x.message).filter(Boolean).join(' | ') : '';
-      throw new Error(failures || `Could not download ${reference}`);
-    }
-  }
-
-  function makeCssUrlsAbsolute(cssText, path, version) {
-    const cssUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${version}/${normalizedAsset(path)}`;
-    // Since the stylesheet is inlined, resolve simple relative url(...) references
-    // against the stylesheet's original URL, not against the launcher's about:blank.
-    return cssText.replace(/url\(\s*(["']?)([^"'()]+?)\1\s*\)/gi, (whole, quote, rawValue) => {
-      const value = rawValue.trim();
-      if (!value || /^(?:data:|blob:|https?:|\/\/|#|var\()/i.test(value)) return whole;
-      try { return `url("${new URL(value, cssUrl).href.replace(/"/g, '%22')}")`; }
-      catch (_) { return whole; }
-    });
-  }
-
-  async function prepareDocument(html, version) {
-    const parsed = new DOMParser().parseFromString(html, 'text/html');
-    if (!parsed.head || !parsed.body) throw new Error('The source index.html is missing its head or body element.');
-
-    const baseHref = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${version}/`;
-    let base = parsed.querySelector('base');
-    if (!base) { base = parsed.createElement('base'); parsed.head.prepend(base); }
-    base.href = baseHref;
-
-    const resources = [
-      ...[...parsed.querySelectorAll('link[rel~="stylesheet"][href]')].map(node => ({node, type:'css', ref:node.getAttribute('href')})),
-      ...[...parsed.querySelectorAll('script[src]')].map(node => ({node, type:'js', ref:node.getAttribute('src')}))
-    ];
-    if (!resources.length) throw new Error('No CSS or JavaScript files were found in the source index.html.');
-
-    // Load all files in parallel, report real per-file progress, then inline them.
-    // Inline assets avoid failures from cross-origin subresources in about:blank,
-    // local-file previews, and sandboxed website launchers.
-    const results = await Promise.all(resources.map(async item => {
-      const path = normalizedAsset(item.ref);
-      const key = 'asset:' + path;
-      setRow(key, 'active', 'Downloading');
-      $('statusTitle').textContent = 'Downloading app files…';
-      $('statusText').textContent = `Downloading ${path} · ${$('fileStep').textContent}.`;
-      try {
-        let contents = await fetchSourceAsset(item.ref, version);
-        if (item.type === 'css') {
-          contents = makeCssUrlsAbsolute(contents, path, version).replace(/<\/style/gi, '<\\/style');
-          const style = parsed.createElement('style');
-          style.setAttribute('data-source-file', path);
-          style.textContent = contents;
-          item.node.replaceWith(style);
-        } else {
-          // Protect the HTML parser from a literal closing-script sequence inside JS.
-          contents = contents.replace(/<\/script/gi, '<\\/script');
-          item.node.removeAttribute('src');
-          item.node.removeAttribute('async');
-          item.node.removeAttribute('defer');
-          item.node.setAttribute('data-source-file', path);
-          item.node.textContent = contents;
-        }
-        setRow(key, 'done', 'Ready');
-        $('statusText').textContent = `Downloaded ${path} · ${$('assetCount').textContent}.`;
-        return {path, ok:true};
-      } catch (error) {
-        setRow(key, 'failed', 'Failed');
-        return {path, ok:false, error:error && error.message ? error.message : String(error)};
-      }
-    }));
-
-    const failures = results.filter(result => !result.ok);
-    if (failures.length) throw new Error('Could not download app file(s): ' + failures.map(result => `${result.path} (${result.error})`).join('; '));
-
-    // Install a lightweight runtime error reporter before the app scripts execute.
-    const monitor = parsed.createElement('script');
-    monitor.textContent = `(function(){function send(type,name,message){try{parent.postMessage({__sukiLauncher:1,type:type,src:name||'',message:message||''},'*')}catch(e){}}window.addEventListener('error',function(e){if(e.message)send('runtime-error','',String(e.message))},true);window.addEventListener('unhandledrejection',function(e){send('runtime-error','',String(e.reason&&e.reason.message||e.reason||'Unhandled promise rejection'))})})();`;
-    parsed.head.prepend(monitor);
-
-    return '<!doctype html>\n' + parsed.documentElement.outerHTML;
-  }
-
-  function mountInFrame(source) {
-    return new Promise((resolve, reject) => {
-      frameErrors = [];
-      let settled = false;
-      const finish = async () => {
-        if (settled) return;
-        settled = true;
-        await sleep(70);
-        const assetErrors = frameErrors.filter(x => x.type === 'asset-error');
-        const runtimeErrors = frameErrors.filter(x => x.type === 'runtime-error');
-        if (assetErrors.length) {
-          reject(new Error('Could not load app file(s): ' + assetErrors.map(x => x.src).join(', ')));
-          return;
-        }
-        if (runtimeErrors.length) {
-          reject(new Error('The app had a startup error: ' + runtimeErrors.slice(0, 2).map(x => x.message).join('; ')));
-          return;
-        }
-        try {
-          const doc = frame.contentDocument;
-          const working = doc && doc.querySelector('#stage') && doc.querySelector('#tabs button') &&
-            doc.querySelector('#s-home .tiles') && doc.querySelector('#grid .card') && !doc.querySelector('#s-home').hidden;
-          if (!working) {
-            reject(new Error('The source files loaded, but the app did not finish initializing. One of its scripts may be incompatible or incomplete.'));
-            return;
-          }
-        } catch (_) {
-          reject(new Error('Could not verify the app startup. Try opening the launcher from your hosted website instead of file://.'));
-          return;
-        }
-        resolve();
-      };
-      frame.onload = finish;
-      frame.onerror = () => {
-        if (!settled) { settled = true; reject(new Error('The embedded app document failed to load.')); }
-      };
-      frame.srcdoc = source;
-    });
-  }
-  window.addEventListener('message', event => {
-    if (event.source !== frame.contentWindow || !event.data || event.data.__sukiLauncher !== 1) return;
-    const data = event.data;
-    const asset = normalizedAsset(data.src);
-    if (data.type === 'asset-start') {
-      setRow('asset:' + asset, 'active', 'Loading');
-      updateFileMeter();
-      $('statusTitle').textContent = 'Loading app files…';
-      $('statusText').textContent = `Loading ${$('currentFile').textContent} · file ${$('fileStep').textContent}.`; 
-    } else if (data.type === 'asset-done') {
-      setRow('asset:' + asset, 'done', 'Ready');
-      updateFileMeter();
-      $('statusTitle').textContent = 'Loading app files…';
-      $('statusText').textContent = `Loaded ${asset} · ${$('assetCount').textContent}.`;
-    } else if (data.type === 'asset-error' || data.type === 'runtime-error') {
-      frameErrors.push(data);
-      if (data.type === 'asset-error') { setRow('asset:' + asset, 'failed', 'Failed'); updateFileMeter(); $('statusText').textContent = `Failed to load ${asset}.`; }
-    }
-  });
-
-  async function launch({manual = false, wantedVersion = null, isUpdate = false} = {}) {
-    if (busy) return;
-    busy = true;
-    $('retry').disabled = true;
-    clearError();
-    const oldSource = currentSource;
-    const oldVersion = currentVersion;
-    const wasRunning = !!oldSource;
-    try {
-      if (!wasRunning) {
-        $('splash').classList.remove('gone');
-        status('Opening source app…', 'Downloading the app page while checking the current version in parallel.', 7);
-        renderAssetQueue(EXPECTED_ASSETS);
-        updateFileMeter();
-      }
-      let version = wantedVersion;
-      let html = null;
-      if (!version && !wasRunning) {
-        // Do not make the version API a serial bottleneck: fetch the branch HTML at the same time.
-        const commitTask = latestCommit().catch(() => null);
-        const htmlTask = getSourceHtml(BRANCH);
-        html = await htmlTask;
-        setRow('index', 'done', 'Downloaded');
-        const result = await Promise.race([
-          commitTask.then(value => ({settled:true, value})),
-          sleep(120).then(() => ({settled:false, value:null}))
-        ]);
-        version = result.settled && result.value ? result.value : BRANCH;
-        if (!result.settled) {
-          // If GitHub's API is slow, let the app start from main; learn its SHA in the background.
-          commitTask.then(sha => {
-            if (!sha) return;
-            lateCommitSha = sha;
-            if (currentVersion === BRANCH) currentVersion = sha;
-          }).catch(() => {});
-        }
-      } else if (!version) {
-        version = await latestCommit();
-      }
-      if (!version) version = BRANCH;
-      if (wasRunning && version === oldVersion && !manual) return;
-      if (!html) {
-        status(wasRunning ? 'Checking update…' : 'Downloading app layout…', 'Fetching index.html and its CSS/JavaScript references.', wasRunning ? 14 : 24);
-        html = await getSourceHtml(version);
-        setRow('index', 'done', 'Downloaded');
-      }
-      const paths = sourceAssetPaths(html);
-      renderAssetQueue(paths.length ? paths : EXPECTED_ASSETS);
-      updateFileMeter();
-      setRow('version', 'done', version === BRANCH ? 'Live branch' : 'Version found');
-      setRow('index', 'done', 'Downloaded');
-      setRow('boot', 'active', 'Waiting for files');
-      const nextSource = await prepareDocument(html, version);
-      if (wasRunning) {
-        note(isUpdate ? 'New source version found. Applying update…' : 'Refreshing app…', 8000);
-        frame.classList.remove('ready');
-        await sleep(180);
-      } else {
-        status('Starting app interface…', 'All source files are downloaded and embedded. Initializing the app.', 90);
-      }
-      await mountInFrame(nextSource);
-      setRow('boot', 'done', 'Ready');
-      $('filePercent').textContent = '100%';
-      $('progress').style.width = '100%';
-      $('progress').parentElement.setAttribute('aria-valuenow', '100');
-      // Give the last checklist step a brief moment to land before the splash fades.
-      await sleep(Math.max(0, 520 - (Date.now() - spotlightStartedAt)));
-      stopSpotlight();
-      currentVersion = (version === BRANCH && lateCommitSha) ? lateCommitSha : version;
-      currentSource = nextSource;
-      await sleep(25);
-      frame.classList.add('ready');
-      $('splash').classList.add('gone');
-      document.title = "Suki's Multi Tools";
-      if (isUpdate) note('App updated to the newest source.', 2400);
-      else if (!wasRunning) {
-        $('statusTitle').textContent = 'App started';
-        $('statusText').textContent = 'All requested files loaded successfully.';
-      }
-    } catch (err) {
-      stopSpotlight();
-      const message = err && err.message ? err.message : String(err);
-      if (wasRunning && oldSource) {
-        try {
-          frameErrors = [];
-          frame.classList.remove('ready');
-          await sleep(180);
-          await mountInFrame(oldSource);
-          currentSource = oldSource;
-          currentVersion = oldVersion;
-          frame.classList.add('ready');
-          note('Update failed; kept the previous working version.', 5000);
-        } catch (_) {
-          $('splash').classList.remove('gone');
-          showError(message);
-          status('Could not update app', 'The updated version failed to start. Refresh this page to retry.', 0);
-        }
-      } else {
-        showError(message + '\n\nCheck your internet connection. If you opened this file locally, try hosting the same index.html on GitHub Pages.');
-        status('Could not start app', 'The source app could not be loaded. Use Try again to retry.', 0);
-      }
-    } finally {
-      busy = false;
-      $('retry').disabled = false;
-    }
-  }
-
-  async function checkForUpdates() {
-    if (busy || document.visibilityState !== 'visible') return;
-    try {
-      const version = await latestCommit();
-      if (currentVersion === BRANCH || !currentVersion || version !== currentVersion) {
-        await launch({wantedVersion:version, isUpdate:!!currentSource});
-      }
-    } catch (_) {
-      // Do not interrupt the app when the update service is unavailable; try again next interval.
-    }
-  }
-
-  renderAssetQueue(EXPECTED_ASSETS);
-  $('retry').addEventListener('click', () => launch({manual:true}));
-  // Attempt launch on page open: works for static hosting and browsers that permit cross-origin
-  // fetches from a local file. The iframe loads the real upstream HTML, not just its JS files.
-  launch();
-  setInterval(() => {
-    if (document.visibilityState === 'visible' && Date.now() - lastCheckAt >= CHECK_MS) checkForUpdates();
-  }, CHECK_MS);
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && Date.now() - lastCheckAt >= CHECK_MS) checkForUpdates();
-  });
+  timeoutId=setTimeout(function(){if(token===currentToken&&!renderDone){renderDone=true;tryNextStrategy(html,baseIndex,strategyIndex+1);}},12000);
+}
+function tryNextStrategy(html,baseIndex,nextStrategy){if(nextStrategy<STRATEGIES.length){beginRender(html,baseIndex,nextStrategy);return;}if(baseIndex===0){setStatus('Trying backup file host…','The first host/embedding method was blocked or assets failed. Switching the same app files to jsDelivr.');beginRender(html,1,0);return;}showFailure('The app frame or one or more app assets were blocked by the browser/host. Try opening this launcher as a hosted page, or use the “Open source app” link.');}
+function finishFrameLoad(token){if(token!==currentToken)return;clearTimeout(timeoutId);clearTimeout(finishTimer);var notReported=resourceItems.filter(function(x){return x.status==='pending'||x.status==='loading';});
+  // A frame load fires after its linked resource requests have completed. Give bridge messages time to arrive first.
+  if(notReported.length){notReported.forEach(function(x){if(x.status==='pending')x.status='loading';});updateProgress();finishTimer=setTimeout(function(){if(token!==currentToken)return;var remaining=resourceItems.filter(function(x){return x.status==='pending'||x.status==='loading';});if(remaining.length){if(assetEventCount===0&&activeBase===0&&!assetFallbackTried){assetFallbackTried=true;setStatus('Switching file host…','The browser did not report the first host’s asset events. Retrying through jsDelivr.');beginRender(currentHtml,1,0);return;}var initialized=false,inspectable=false;try{var d=frame.contentDocument;if(d){inspectable=true;var tabs=d.querySelector('#tabs');initialized=!!(tabs&&(tabs.children.length>0||tabs.textContent.trim().length>0));}}catch(e){}remaining.forEach(function(x){x.status=(initialized||!inspectable)?'done':'failed';});updateProgress();}finalizeLoad(token);},650);return;}finalizeLoad(token);
+}
+function finalizeLoad(token){if(token!==currentToken)return;var failed=resourceItems.filter(function(x){return x.status==='failed';});if(failed.length&&activeBase===0&&!assetFallbackTried){assetFallbackTried=true;setStatus('Switching file host…','Some files failed on GitHub Raw. Retrying the app files through jsDelivr.');beginRender(currentHtml,1,0);return;}
+  var goodScripts=resourceItems.filter(function(x){return x.kind==='js'&&x.status==='done';}).length;
+  if(failed.length){setStatus('Loaded with file errors','The app may be incomplete because some source assets failed.');setError('Failed file(s): '+failed.map(function(x){return x.path;}).join(', ')+'. Check whether the host blocks these external files, then press Try again.');dot.style.background='#fda4af';dot.style.boxShadow='0 0 15px #fda4af';if(!goodScripts){showFailure('The JavaScript files did not load, so the app cannot initialize. Failed file(s): '+failed.map(function(x){return x.path;}).join(', ')+'. Try again or use the source app link.');return;}}
+  else{setStatus('App ready','All '+resourceItems.length+' linked CSS/JavaScript files reported as loaded.');dot.style.background='#86efac';dot.style.boxShadow='0 0 15px #86efac';}
+  var total=allItems.length,done=allItems.filter(function(x){return x.status==='done'||x.status==='failed';}).length;fileEl.textContent=failed.length?'App interface (some files failed)':'Initialize app interface';countEl.textContent=done+'/'+total+' · '+Math.round(done/total*100)+'%';bar.style.width=Math.round(done/total*100)+'%';readyEl.textContent=allItems.filter(function(x){return x.status==='done';}).length+'/'+total+' files ready';
+  frame.classList.add('ready');revealed=true;setTimeout(function(){splash.classList.add('gone');},230);retry.disabled=false;
+}
+function showFailure(message){clearTimeout(timeoutId);clearTimeout(finishTimer);setStatus('Could not start app','The source app could not be loaded. Use Try again to retry.');setError(message);dot.style.background='#fda4af';dot.style.boxShadow='0 0 15px #fda4af';retry.disabled=false;}
+function parseAndRender(html,force){var hash=hashText(html);if(!force&&hash===currentHash)return;currentHash=hash;currentHtml=html;assetFallbackTried=false;beginRender(html,0,activeStrategy<STRATEGIES.length?activeStrategy:0);}
+function hashText(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return(h>>>0).toString(16)+':'+s.length;}
+function load(force){if(loading){loadAgain=loadAgain||force;return Promise.resolve();}loading=true;retry.disabled=true;clearError();dot.style.background='var(--accent)';dot.style.boxShadow='0 0 15px var(--accent)';setStatus('Connecting to source…','Fetching index.html from GitHub and discovering every linked CSS/JavaScript file.');fileEl.textContent='index.html';return getText().then(function(html){var h=hashText(html);if(force||h!==currentHash){currentHash=h;currentHtml=html;parseAndRender(html,true);}else{setStatus('App is up to date','No changes to index.html were detected.');} }).catch(function(e){if(!currentHash)showFailure(e.message);else console.warn('Source update check failed:',e);}).then(function(){loading=false;retry.disabled=false;if(loadAgain){var f=loadAgain;loadAgain=false;load(f);}});}
+function checkCommit(){return fetch(COMMIT_API,{cache:'no-store',headers:{Accept:'application/vnd.github+json'}}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(j){if(!j||!j.sha)return;if(currentSha&&j.sha!==currentSha){currentSha=j.sha;load(true);}else currentSha=j.sha;}).catch(function(){/* raw index polling still works if API is rate-limited */});}
+retry.addEventListener('click',function(){frame.classList.remove('ready');splash.classList.remove('gone');load(true);});
+load(true).then(checkCommit);
+setInterval(function(){if(!document.hidden)load(false);},POLL_FILE_MS);
+setInterval(function(){if(!document.hidden)checkCommit();},POLL_COMMIT_MS);
+document.addEventListener('visibilitychange',function(){if(!document.hidden){load(false);checkCommit();}});
+window.addEventListener('online',function(){load(false);});
 })();
 </script>
 </body>
