@@ -1,2 +1,1 @@
-# x
-shorter link fr
+shorter link fr, no this aint twitter
