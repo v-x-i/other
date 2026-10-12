@@ -4,4 +4,4 @@ dada suki x vladdy daddy
 
 shi pure aura gng
 
-heh :3 
+heh :3 <-- Vlad gay as shit
