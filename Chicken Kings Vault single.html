@@ -24,6 +24,23 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
 #gameBar{position:fixed;z-index:8;top:10px;left:10px;right:10px;display:none;align-items:center;gap:9px;min-height:42px;padding:6px 9px;border:1px solid #4a4336;border-radius:12px;background:#111114eF;box-shadow:0 6px 26px #0007;backdrop-filter:blur(12px)}#gameBar.visible{display:flex}#gameBar button{padding:6px 10px;font-size:12px;border-radius:8px}#gameTitle{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:#e7dfd0;font-weight:700}#gameBar .right{margin-left:auto;display:flex;gap:7px;flex-shrink:0}#notice{position:fixed;right:13px;bottom:13px;z-index:12;max-width:min(390px,calc(100vw - 26px));padding:10px 13px;border:1px solid #554832;border-radius:11px;background:#17140fee;color:#f4e6cb;box-shadow:0 8px 28px #0006;font-size:12px;opacity:0;transform:translateY(7px);pointer-events:none;transition:opacity .2s,transform .2s}#notice.show{opacity:1;transform:translateY(0)}
 @keyframes pulse{0%,100%{opacity:.48;transform:scale(.85)}50%{opacity:1;transform:scale(1.08)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Premium vault-style loading screen refresh */
+#loading{overflow:auto;isolation:isolate;padding:clamp(14px,3vw,34px);background:radial-gradient(ellipse at 18% 12%,#67451b55 0,transparent 32%),radial-gradient(ellipse at 84% 76%,#8b5b1d30 0,transparent 32%),linear-gradient(135deg,#17130d 0%,#0c0c0f 48%,#17120b 100%)}
+#loading:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.16;background-image:linear-gradient(#c08a3517 1px,transparent 1px),linear-gradient(90deg,#c08a3517 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,#000,transparent 85%)}
+#loading:after{content:"";position:fixed;width:min(56vw,560px);aspect-ratio:1;border:1px solid #d6a54b18;border-radius:50%;top:-34%;right:-12%;z-index:-1;box-shadow:0 0 0 38px #d6a54b08,0 0 0 80px #d6a54b06;animation:orbitGlow 9s ease-in-out infinite alternate;pointer-events:none}
+.panel{position:relative;width:min(690px,100%);max-height:calc(100dvh - 32px);padding:clamp(22px,4.5vw,38px);border:1px solid #80612f80;border-radius:26px;background:linear-gradient(145deg,#242016f5 0%,#171619f8 58%,#121113f8 100%);box-shadow:0 32px 110px #000b,inset 0 1px #fff1;backdrop-filter:blur(22px)}
+.panel:before{content:"LIVE REPOSITORY LINK";display:inline-flex;align-items:center;gap:8px;margin-bottom:19px;padding:6px 10px;border:1px solid #7356288a;border-radius:999px;background:#3a2b164d;color:#e6c98c;font-size:9px;font-weight:850;letter-spacing:.16em}
+.panel:after{content:"";position:absolute;left:0;right:0;top:0;height:2px;border-radius:26px 26px 0 0;background:linear-gradient(90deg,transparent,#f5b942,#fff0bc,#c17d23,transparent);opacity:.85}
+.brand{gap:16px;margin-bottom:8px}.logo{width:62px;height:62px;flex:0 0 auto;border-radius:19px;font-size:32px;background:linear-gradient(145deg,#79501d,#332416);border:1px solid #b17b2c;box-shadow:inset 0 1px #ffffff24,0 8px 26px #0005}.tag{display:flex;align-items:center;gap:7px;color:#d8bb7c;font-size:11px;font-weight:750;letter-spacing:.045em}.tag:before{content:"";width:6px;height:6px;border-radius:50%;background:#f6b83f;box-shadow:0 0 10px #f6b83f}
+h1{font-size:clamp(26px,5vw,36px);letter-spacing:-.055em}.intro{max-width:560px;margin:14px 0 23px;color:#b8b4bd;font-size:14px;line-height:1.75}
+.status{padding:clamp(14px,3vw,20px);border:1px solid #454047;border-radius:19px;background:linear-gradient(145deg,#111114ed,#19181bed);box-shadow:inset 0 1px #fff08,0 12px 34px #0002}.status-title{font-size:15px;letter-spacing:-.015em}.dot{width:9px;height:9px;background:#ffc04d;box-shadow:0 0 16px #ffc04d99}.status-text{font-size:12px;line-height:1.65;color:#aaa6b0;min-height:20px}
+.file-meter{margin-top:16px;padding:13px 14px;border:1px solid #5b492c;border-radius:13px;background:linear-gradient(100deg,#201a11,#191715);box-shadow:inset 0 1px #fff08}.file-caption{color:#b8a078;font-size:9px;letter-spacing:.17em}.file-name{max-width:min(390px,52vw);font-size:13px;color:#fff1d1}.file-step{color:#d8c59e}.file-percent{font-size:21px;color:#ffca62}.bar{height:7px;margin-top:10px;background:#383026}.bar span{position:relative;background:linear-gradient(90deg,#a66a1d,#ffc34f,#ffe3a1);box-shadow:0 0 14px #f5b94240}.bar span:after{content:"";display:block;height:100%;width:32%;margin-left:auto;background:linear-gradient(90deg,transparent,#fff8,transparent);animation:barShine 1.6s linear infinite}
+.load-head{margin:17px 3px 9px;color:#a59b8a;font-size:9px;letter-spacing:.16em}.load-head span:last-child{color:#e6d2a9}.asset-list{max-height:180px;gap:6px;padding:2px 3px 2px 1px}.asset-row{grid-template-columns:19px minmax(0,1fr) auto;gap:9px;min-height:32px;padding:7px 10px;border:1px solid #ffffff08;border-radius:10px;background:#0c0c0fb8;font-size:11px}.asset-row .asset-icon{width:18px;height:18px}.asset-row.active{border-color:#b88434;background:linear-gradient(100deg,#3a2b16,#211b13);box-shadow:0 0 0 1px #dca54112;color:#fff5df}.asset-row.active .asset-icon{animation:pulse 1s ease-in-out infinite}.asset-row.done{border-color:#244a37;background:#102219aa}.asset-row.failed{border-color:#70303e}
+.actions{margin-top:18px;gap:10px}.actions button,.actions .button{min-height:44px;padding:11px 16px;border-radius:12px}.actions button{box-shadow:0 6px 18px #0003}.actions .secondary{background:#302d32;border-color:#4a454e}.hint{margin-top:17px;max-width:560px;font-size:11px;line-height:1.7;color:#89858f}.hint code{color:#d6c9ac;background:#ffffff0a;padding:2px 5px;border-radius:4px}
+@keyframes barShine{from{transform:translateX(-110%)}to{transform:translateX(110%)}}@keyframes orbitGlow{from{transform:translate3d(0,0,0) rotate(0deg);opacity:.65}to{transform:translate3d(-24px,22px,0) rotate(14deg);opacity:1}}
+@media(max-width:520px){.panel{border-radius:21px}.panel:before{margin-bottom:15px}.brand{gap:12px}.logo{width:52px;height:52px;font-size:27px;border-radius:16px}.file-name{max-width:54vw}.asset-list{max-height:145px}.intro{font-size:13px}}
+@media(prefers-reduced-motion:reduce){#loading:after,.bar span:after{animation:none!important}}
 </style>
 </head>
 <body>
@@ -31,12 +48,12 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
 <div id="gameBar" aria-label="Game navigation"><button id="homeBtn" type="button">← Home</button><span id="gameTitle">Loading game…</span><div class="right"><button id="reloadBtn" class="secondary" type="button">↻ Reload</button><a id="sourceLink" class="button secondary" href="https://github.com/AniItsukiCoded/ChickenKingsVault/tree/main" target="_blank" rel="noopener noreferrer">Repo ↗</a></div></div>
 <div id="loading">
   <section class="panel" aria-labelledby="title">
-    <div class="brand"><div class="logo">🐔</div><div><h1 id="title">Chicken Kings Vault</h1><div class="tag">Live GitHub repository launcher</div></div></div>
-    <p class="intro">Fetching the real site files from GitHub and starting the website. Game pages are loaded from the repository when you open them.</p>
+    <div class="brand"><div class="logo">🐔</div><div><h1 id="title">Chicken Kings Vault</h1><div class="tag">LIVE SYNC · AUTO-UPDATING LAUNCHER</div></div></div>
+    <p class="intro">Syncing the live vault from GitHub. The homepage opens here; games launch as standalone pages in new tabs so they are not trapped inside the launcher frame.</p>
     <div class="status" role="status" aria-live="polite"><div class="status-title"><span class="dot" id="dot"></span><span id="statusTitle">Connecting to GitHub…</span></div><div class="status-text" id="statusText">Checking the latest repository version and downloading index.html.</div><div class="file-meter"><div class="file-current"><span class="file-caption">CURRENT FILE</span><span class="file-name" id="currentFile">index.html</span></div><div class="file-metrics"><span class="file-step" id="fileStep">1/1</span><span class="file-percent" id="filePercent">0%</span></div></div><div class="bar" role="progressbar" aria-label="Repository files loaded" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progress"></span></div><div class="load-head"><span>LIVE FILE LOAD</span><span id="assetCount">Preparing…</span></div><div class="asset-list" id="assetList"></div></div>
     <div class="error" id="error" hidden></div>
     <div class="actions"><button id="retry" type="button">↻ Try again</button><a class="button secondary" href="https://github.com/AniItsukiCoded/ChickenKingsVault/tree/main" target="_blank" rel="noopener noreferrer">Open source repository ↗</a></div>
-    <p class="hint">Internet access is required. This launcher fetches files from the public <code>main</code> branch and checks for repository updates while open.</p>
+    <p class="hint">Internet access is required. This launcher fetches the public repository and checks for updates. Games are fetched from the repository, then run in standalone tabs; repository CDN URLs are never opened as raw HTML pages.</p>
   </section>
 </div>
 <div id="notice" aria-live="polite"></div>
@@ -70,6 +87,14 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
   }
   function rootFor(v = version) { return `${RAW_ORIGIN}/${OWNER}/${REPO}/${v}/`; }
   function rawUrl(path, v = version) { return rootFor(v) + pathEncode(path); }
+  function directRootFor(v = version) { return `${CDN_ROOT}${encodeURIComponent(v)}/`; }
+  function directUrl(path, v = version) { return directRootFor(v) + pathEncode(cleanPath(path)); }
+  function directDirUrlFor(path) {
+    const normalized = cleanPath(path);
+    const cut = normalized.lastIndexOf('/');
+    return directRootFor() + (cut < 0 ? '' : pathEncode(normalized.slice(0, cut + 1)));
+  }
+  function directFileUrlFor(path) { return directUrl(cleanPath(path)); }
   function cleanPath(path) {
     let value = String(path || '').split(/[?#]/, 1)[0].replace(/\\/g, '/');
     value = value.replace(/^\/+/, '');
@@ -100,6 +125,22 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
         rest = rest.slice(slash + 1);
       }
       return cleanPath(rest || 'index.html');
+    } catch (_) { return null; }
+  }
+  function repoPathFromUrl(urlString) {
+    const rawPath = toRepoPathFromUrl(urlString);
+    if (rawPath !== null) return rawPath;
+    try {
+      const u = new URL(urlString);
+      if (u.hostname !== 'cdn.jsdelivr.net' && u.hostname !== 'fastly.jsdelivr.net') return null;
+      const prefix = `/gh/${OWNER}/${REPO}@`;
+      if (!u.pathname.startsWith(prefix)) return null;
+      const rest = u.pathname.slice(prefix.length);
+      const slash = rest.indexOf('/');
+      if (slash < 0) return 'index.html';
+      const ref = decodeURIComponent(rest.slice(0, slash));
+      if (ref !== version && ref !== BRANCH && !/^[a-f0-9]{7,40}$/i.test(ref)) return null;
+      return cleanPath(decodeURIComponent(rest.slice(slash + 1)) || 'index.html');
     } catch (_) { return null; }
   }
   function pathFromReference(ref, baseUrl) {
@@ -138,13 +179,19 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
   async function fetchRepoText(path) {
     const p = cleanPath(path);
     if (!p) throw new Error('The repository file path was empty.');
-    const urls = [rawUrl(p), `${RAW_ORIGIN}/${OWNER}/${REPO}/refs/heads/main/${pathEncode(p)}`, `${CDN_ROOT}${encodeURIComponent(version)}/${pathEncode(p)}`];
-    const attempts = urls.map(url => fetchText(url).then(text => ({ text, url })));
-    try { return await Promise.any(attempts); }
-    catch (error) {
-      const messages = error && error.errors ? error.errors.map(e => e?.message).filter(Boolean) : [];
-      throw new Error(`Could not fetch ${p}. ${messages.slice(0, 2).join(' | ') || 'GitHub and CDN requests failed.'}`);
+    // The raw GitHub file is always the primary source. Use the CDN only as a
+    // fallback for networks that cannot fetch raw.githubusercontent.com.
+    const urls = [
+      rawUrl(p),
+      `${RAW_ORIGIN}/${OWNER}/${REPO}/refs/heads/main/${pathEncode(p)}`,
+      `${CDN_ROOT}${encodeURIComponent(version)}/${pathEncode(p)}`
+    ];
+    const messages = [];
+    for (const url of urls) {
+      try { return { text: await fetchText(url), url }; }
+      catch (error) { messages.push(error?.message || String(error)); }
     }
+    throw new Error(`Could not fetch ${p}. ${messages.slice(0, 3).join(' | ') || 'GitHub and CDN requests failed.'}`);
   }
   async function getLatestVersion() {
     lastUpdateCheck = Date.now();
@@ -250,7 +297,7 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
         const val = el.getAttribute(attr).trim();
         if (val.startsWith('/') && !val.startsWith('//')) {
           const normalized = cleanPath(val);
-          el.setAttribute(attr, rawUrl(normalized || 'index.html'));
+          el.setAttribute(attr, directUrl(normalized || 'index.html'));
         }
       }
     }
@@ -280,8 +327,8 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
     const v = String(value || '').trim();
     if (!v || /^(?:data:|blob:|https?:|\/\/|#|var\()/i.test(v)) return v;
     try {
-      if (v.startsWith('/')) return rawUrl(cleanPath(v));
-      return new URL(v, fileUrlFor(cssPath)).href;
+      if (v.startsWith('/')) return directUrl(cleanPath(v));
+      return new URL(v, directFileUrlFor(cssPath)).href;
     } catch (_) { return v; }
   }
   async function inlineCssImports(css, cssPath, depth = 0) {
@@ -320,7 +367,7 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
     return result.replace(/<\/style/gi, '<\\/style');
   }
   function rewriteModuleImports(source, scriptPath) {
-    const scriptUrl = fileUrlFor(scriptPath);
+    const scriptUrl = directFileUrlFor(scriptPath);
     let output = source.replace(/\bimport\.meta\.url\b/g, JSON.stringify(scriptUrl));
     // Inline module files need their relative static/dynamic imports anchored to their original path.
     output = output.replace(/(\bfrom\s*|\bimport\s*\(|^\s*import\s*)(["'])(\.{1,2}\/[^"']+)\2/gm, (all, lead, quote, spec) => {
@@ -330,7 +377,79 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
   }
   function routeRuntime() {
     const rawRoot = rootFor();
-    return `(()=>{\n'use strict';\nconst ROOT=${JSON.stringify(rawRoot)};\nconst PREFIX=${JSON.stringify(REPO_PREFIX)};\nconst VERSION=${JSON.stringify(version)};\nfunction pathFrom(u){try{const x=new URL(u,document.baseURI);if(x.hostname!=='raw.githubusercontent.com')return null;const p=decodeURIComponent(x.pathname);if(!p.startsWith(PREFIX))return null;let r=p.slice(PREFIX.length);if(r.startsWith('refs/heads/main/'))r=r.slice('refs/heads/main/'.length);else{const i=r.indexOf('/');if(i<0)return 'index.html';const ref=r.slice(0,i);if(ref!==VERSION&&ref!=='main')return null;r=r.slice(i+1);}return r||'index.html';}catch(e){return null;}}\ndocument.addEventListener('click',e=>{const a=e.target&&e.target.closest?e.target.closest('a[href]'):null;if(!a||e.defaultPrevented||a.hasAttribute('download')||a.target&&a.target!=='_self')return;const href=a.getAttribute('href')||'';if(href.startsWith('#')&&href!=='#ckv-home')return;const u=href==='#ckv-home'?ROOT+'index.html':new URL(href,document.baseURI).href;const p=pathFrom(u);if(p===null)return;if(!/\\.(?:html?|xhtml)$/i.test(p)&&p!=='index.html')return;e.preventDefault();e.stopPropagation();parent.postMessage({__chickenKingsVault:1,type:'navigate',path:p},'*');},true);\nwindow.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.baseURI!==ROOT)parent.postMessage({__chickenKingsVault:1,type:'home'},'*');});\n})();`;
+    const directRoot = directRootFor();
+    return `(()=>{
+'use strict';
+const RAWROOT=${JSON.stringify(rawRoot)};
+const OWNER=${JSON.stringify(OWNER)};
+const REPO=${JSON.stringify(REPO)};
+const VERSION=${JSON.stringify(version)};
+function clean(p){return String(p||'').split(/[?#]/,1)[0].replace(/\\\\/g,'/').replace(/^\\/+/, '');}
+function pathFrom(u){try{
+  const x=new URL(u,document.baseURI);
+  if(x.hostname==='raw.githubusercontent.com'){
+    const pre='/'+OWNER+'/'+REPO+'/';
+    if(!x.pathname.startsWith(pre))return null;
+    let r=decodeURIComponent(x.pathname.slice(pre.length));
+    if(r.startsWith('refs/heads/main/'))r=r.slice('refs/heads/main/'.length);
+    else {const i=r.indexOf('/');if(i<0)return 'index.html';const ref=r.slice(0,i);if(ref!==VERSION&&ref!=='main'&&!/^[a-f0-9]{7,40}$/i.test(ref))return null;r=r.slice(i+1);}
+    return clean(r||'index.html');
+  }
+  if(x.hostname==='cdn.jsdelivr.net'||x.hostname==='fastly.jsdelivr.net'){
+    const pre='/gh/'+OWNER+'/'+REPO+'@';
+    if(!x.pathname.startsWith(pre))return null;
+    const r=x.pathname.slice(pre.length),i=r.indexOf('/');if(i<0)return 'index.html';
+    const ref=decodeURIComponent(r.slice(0,i));if(ref!==VERSION&&ref!=='main'&&!/^[a-f0-9]{7,40}$/i.test(ref))return null;
+    return clean(decodeURIComponent(r.slice(i+1))||'index.html');
+  }
+  // Also handle relative game links when this launcher is hosted inside Canva Code.
+  if(x.origin===location.origin){
+    const decoded=decodeURIComponent(x.pathname);
+    const match=decoded.match(/(?:^|\\/)(gamefiles\\/.*\\.html?)$/i);
+    if(match)return clean(match[1]);
+  }
+  return null;
+}catch(e){return null;}}
+function popupFor(path){
+  const p=clean(path);
+  if(!p||(!/\\.html?$/i.test(p)&&p!=='index.html'))return;
+  if(p==='index.html'){parent.postMessage({__chickenKingsVault:1,type:'home'},'*');return;}
+  const name='ckv-game-'+Date.now()+'-'+Math.random().toString(36).slice(2,9);
+  let w=null;try{w=window.open('about:blank',name);}catch(e){}
+  if(!w){parent.postMessage({__chickenKingsVault:1,type:'popup-blocked'},'*');return;}
+  try{w.document.open();w.document.write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Loading game…</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0b0d;color:#f1f1f3;font:15px system-ui,sans-serif}main{max-width:560px;padding:28px;border:1px solid #4a4336;border-radius:16px;background:#151519}p{color:#aaa}</style></head><body><main><h2>Opening game…</h2><p>Loading the game files into a standalone tab.</p></main></body></html>');w.document.close();}catch(e){}
+  parent.postMessage({__chickenKingsVault:1,type:'navigate',path:p,windowName:name},'*');
+}
+window.__ckvLaunchGame=popupFor;
+// Some browser shells block the primary CDN hostname; retry failed repo images on jsDelivr's alternate edge.
+window.addEventListener('error',e=>{
+  const im=e.target;
+  if(!im||im.tagName!=='IMG'||im.dataset.ckvFallback==='raw')return;
+  try{
+    const u=new URL(im.src);
+    const prefix='/gh/'+OWNER+'/'+REPO+'@';
+    if(!im.dataset.ckvFallback && u.pathname.startsWith(prefix) && u.hostname==='cdn.jsdelivr.net'){
+      im.dataset.ckvFallback='fastly';u.hostname='fastly.jsdelivr.net';im.src=u.href;return;
+    }
+    if(im.dataset.ckvFallback==='fastly' && u.pathname.startsWith(prefix) && u.hostname==='fastly.jsdelivr.net'){
+      const rest=u.pathname.slice(prefix.length);const slash=rest.indexOf('/');
+      if(slash>0){const ref=decodeURIComponent(rest.slice(0,slash));const file=rest.slice(slash+1);im.dataset.ckvFallback='raw';im.src='https://raw.githubusercontent.com/'+OWNER+'/'+REPO+'/'+ref+'/'+file+u.search;}
+    }
+  }catch(err){}
+},true);
+document.addEventListener('click',e=>{
+  const a=e.target&&e.target.closest?e.target.closest('a[href]'):null;
+  if(!a||e.defaultPrevented||a.hasAttribute('download')||(a.target&&a.target!=='_self'))return;
+  const href=a.getAttribute('href')||'';
+  if(href.startsWith('#')&&href!=='#ckv-home')return;
+  let u;try{u=href==='#ckv-home'?RAWROOT+'index.html':new URL(href,document.baseURI).href;}catch(err){return;}
+  const p=pathFrom(u);if(p===null)return;
+  if(!/\\.html?$/i.test(p)&&p!=='index.html')return;
+  e.preventDefault();
+  popupFor(p);
+},true);
+window.addEventListener('keydown',e=>{if(e.key==='Escape')parent.postMessage({__chickenKingsVault:1,type:'home'},'*');});
+})();`;
   }
 
   async function prepareDocument(path, html) {
@@ -338,7 +457,7 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
     const doc = new DOMParser().parseFromString(html, 'text/html');
     if (!doc.head || !doc.body) throw new Error(`${normalizedPath} does not contain a complete HTML document.`);
     const base = doc.createElement('base');
-    base.href = dirUrlFor(normalizedPath);
+    base.href = directDirUrlFor(normalizedPath);
     const oldBase = doc.querySelector('base');
     if (oldBase) oldBase.replaceWith(base); else doc.head.prepend(base);
     patchRootPaths(doc);
@@ -374,10 +493,15 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
         let contents = fetched.text;
         const type = (node.getAttribute('type') || '').trim().toLowerCase();
         if (type === 'module') contents = rewriteModuleImports(contents, localPath);
-        // Avoid a source-script navigation bypass on the repository's built-in random-game card.
+        // Make dynamically-created cover images absolute so they never resolve against a Canva codelet URL.
+        if (isHome && /(?:^|\/)games\.js$/i.test(localPath)) {
+          const imageRoot = directRootFor();
+          contents = contents.replace(/(src\s*=\s*[\"'])gameimages\//gi, `$1${imageRoot}gameimages/`);
+        }
+        // Random Game cards use the same popup + loader as normal game cards.
         if (isHome && /(?:^|\/)assets\/app\.js$/i.test(localPath)) {
           contents = contents.replace(/window\.location\.href\s*=\s*random\.href\s*;/g,
-            "window.parent.postMessage({__chickenKingsVault:1,type:'navigate',path:random.href},'*');");
+            "if (window.__ckvLaunchGame) window.__ckvLaunchGame(random.href); else window.parent.postMessage({__chickenKingsVault:1,type:'navigate',path:random.href},'*');");
         }
         node.removeAttribute('src');
         node.removeAttribute('async');
@@ -404,10 +528,228 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
     return '<!doctype html>\n' + doc.documentElement.outerHTML;
   }
 
+  function writeTabDocument(gameWindow, html) {
+    if (!gameWindow || gameWindow.closed) throw new Error('The game tab was closed before it finished loading.');
+    gameWindow.document.open();
+    gameWindow.document.write(html);
+    gameWindow.document.close();
+  }
+
+  function showTabError(gameWindow, path, error) {
+    if (!gameWindow || gameWindow.closed) return;
+    const message = error && error.message ? error.message : String(error);
+    const safeMessage = escapeHtml(message);
+    const safePath = escapeHtml(path);
+    const repoUrl = `https://github.com/${OWNER}/${REPO}/tree/${encodeURIComponent(version)}/${pathEncode(path)}`;
+    try {
+      gameWindow.document.open();
+      gameWindow.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Game failed to load</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0b0d;color:#f1f1f3;font:15px/1.55 system-ui,sans-serif;padding:20px;box-sizing:border-box}.panel{width:min(620px,100%);padding:26px;border:1px solid #51432b;border-radius:18px;background:#171619;box-shadow:0 24px 70px #0008}p{color:#aaa}code{overflow-wrap:anywhere;color:#f4d69d}a{color:#ffc65e}</style></head><body><main class="panel"><h2>Could not open this game</h2><p>File: <code>${safePath}</code></p><p>${safeMessage}</p><p>The raw-file URLs are not opened as webpages; the launcher tried to fetch the source and run it in this tab. Check the connection or repository path, then launch it again.</p><p><a href="${repoUrl}" target="_blank" rel="noopener noreferrer">View source repository</a></p></main></body></html>`);
+      gameWindow.document.close();
+    } catch (_) {}
+  }
+
+  function sourceBaseFor(path, doc) {
+    const baseNode = doc.querySelector('base[href]');
+    if (!baseNode) return directDirUrlFor(path);
+    try {
+      const resolved = new URL(baseNode.getAttribute('href'), directFileUrlFor(path)).href;
+      const localPath = repoPathFromUrl(resolved);
+      if (localPath !== null) {
+        const cleanUrl = new URL(resolved);
+        const isDir = cleanUrl.pathname.endsWith('/');
+        return isDir ? resolved : directDirUrlFor(localPath);
+      }
+      return resolved;
+    } catch (_) { return directDirUrlFor(path); }
+  }
+
+  async function prepareStandaloneHtml(path, html, baseOverride = '') {
+    const normalizedPath = cleanPath(path);
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    if (!doc.head || !doc.body) throw new Error(`${path} is not a complete HTML page.`);
+
+    // Keep a source page's own external <base> (many games rely on a CDN base),
+    // otherwise anchor every relative file to this repository page.
+    let base = doc.querySelector('base[href]');
+    if (!base) {
+      base = doc.createElement('base');
+      base.href = baseOverride || directDirUrlFor(normalizedPath);
+      doc.head.prepend(base);
+    } else {
+      const previous = base.getAttribute('href') || '';
+      try {
+        const resolved = new URL(previous, directFileUrlFor(normalizedPath)).href;
+        const repoPath = repoPathFromUrl(resolved);
+        if (repoPath !== null) {
+          const u = new URL(resolved);
+          base.href = u.pathname.endsWith('/') ? resolved : directDirUrlFor(repoPath);
+        } else base.href = resolved;
+      } catch (_) { base.href = baseOverride || directDirUrlFor(normalizedPath); }
+    }
+
+    const baseHref = base.href;
+    const baseIsRepo = repoPathFromUrl(baseHref) !== null || baseHref.startsWith(directRootFor());
+    if (baseIsRepo) {
+      // GitHub HTML pages are often returned as text/plain. Rewrite root-local
+      // paths to the repository CDN so binary and dynamically requested assets
+      // keep the correct MIME types in the actual game tab.
+      for (const el of doc.querySelectorAll('[href],[src],[poster],[data]')) {
+        for (const attr of ['href','src','poster','data']) {
+          if (!el.hasAttribute(attr)) continue;
+          const value = el.getAttribute(attr).trim();
+          if (value.startsWith('/') && !value.startsWith('//')) {
+            el.setAttribute(attr, directUrl(cleanPath(value) || 'index.html'));
+          }
+        }
+      }
+    }
+
+    // Inline repository-owned stylesheets and scripts. This is the important
+    // distinction from navigating to a raw .html URL: the document executes
+    // as a real page while raw GitHub remains the source of each file.
+    const cssTasks = [...doc.querySelectorAll('link[rel~="stylesheet"][href]')].map(async node => {
+      let resolved;
+      try { resolved = new URL(node.getAttribute('href'), baseHref).href; } catch (_) { return; }
+      const localPath = repoPathFromUrl(resolved);
+      if (localPath === null) return;
+      try {
+        const fetched = await fetchRepoText(localPath);
+        const style = doc.createElement('style');
+        style.dataset.sourceFile = localPath;
+        style.textContent = (await prepareCss(fetched.text, localPath)).replace(/<\/style/gi, '<\\/style');
+        node.replaceWith(style);
+      } catch (error) {
+        // Leave an absolute CDN stylesheet link as a fallback if fetching the
+        // source failed; report the file rather than aborting the whole game.
+        node.href = resolved;
+        note(`Could not inline ${localPath}; keeping its direct asset link.`, 3500);
+      }
+    });
+
+    const scriptTasks = [...doc.querySelectorAll('script[src]')].map(async node => {
+      let resolved;
+      try { resolved = new URL(node.getAttribute('src'), baseHref).href; } catch (_) { return; }
+      const localPath = repoPathFromUrl(resolved);
+      if (localPath === null) return;
+      try {
+        const fetched = await fetchRepoText(localPath);
+        let contents = fetched.text;
+        const type = (node.getAttribute('type') || '').trim().toLowerCase();
+        if (type === 'module') contents = rewriteModuleImports(contents, localPath);
+        const replacement = doc.createElement('script');
+        for (const attr of [...node.attributes]) {
+          if (['src','async','defer','integrity','crossorigin','referrerpolicy'].includes(attr.name.toLowerCase())) continue;
+          replacement.setAttribute(attr.name, attr.value);
+        }
+        replacement.dataset.sourceFile = localPath;
+        replacement.textContent = contents.replace(/<\/script/gi, '<\\/script');
+        node.replaceWith(replacement);
+      } catch (error) {
+        node.src = resolved;
+        note(`Could not inline ${localPath}; keeping its direct asset link.`, 3500);
+      }
+    });
+    await Promise.all([...cssTasks, ...scriptTasks]);
+
+    // Give external iframe-wrapper pages no role here; resolveGameTarget has
+    // already followed simple wrappers to their actual game document.
+    const leaf = normalizedPath.split('/').pop().replace(/\.x?html?$/i, '').replace(/[-_]/g, ' ');
+    if (!doc.title || /university of adelaide/i.test(doc.title)) doc.title = leaf || 'Chicken Kings Vault Game';
+    return '<!doctype html>\n' + doc.documentElement.outerHTML;
+  }
+
+  function isWrapperDocument(doc) {
+    const frames = [...doc.querySelectorAll('iframe[src]')];
+    if (frames.length !== 1) return null;
+    const frameNode = frames[0];
+    const bodyChildren = [...doc.body.children];
+    const bodyText = (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+    const styleText = (frameNode.getAttribute('style') || '') + ' ' + (doc.querySelector('style')?.textContent || '');
+    const fullScreenFrame = /100vw|100vh|position:\s*fixed/i.test(styleText) && /width:\s*100%|width:\s*100vw/i.test(styleText) && /height:\s*100%|height:\s*100vh/i.test(styleText);
+    const tinyShell = bodyChildren.length <= 2 && bodyText.length < 80 && frameNode.hasAttribute('allowfullscreen');
+    const looksLikeShell = !!doc.querySelector('.frame-wrapper, #frameWrapper, #gameFrame') || fullScreenFrame || tinyShell;
+    return looksLikeShell ? frameNode : null;
+  }
+
+  async function resolveGameTarget(path) {
+    let nextPath = cleanPath(path) || 'index.html';
+    const visited = new Set();
+    for (let depth = 0; depth < 10; depth++) {
+      if (visited.has(nextPath)) throw new Error(`A loop was detected while resolving ${nextPath}.`);
+      visited.add(nextPath);
+      const fetched = await fetchRepoText(nextPath);
+      const doc = new DOMParser().parseFromString(fetched.text, 'text/html');
+      if (!doc.head || !doc.body) throw new Error(`${nextPath} did not return a valid HTML document.`);
+      const frameNode = isWrapperDocument(doc);
+      if (!frameNode) return { path: nextPath, html: fetched.text };
+      const src = (frameNode.getAttribute('src') || '').trim();
+      if (!src || /^(?:about:blank|javascript:|data:|blob:|#)/i.test(src)) return { path: nextPath, html: fetched.text };
+      const pageBase = sourceBaseFor(nextPath, doc);
+      let targetUrl;
+      try { targetUrl = new URL(src, pageBase).href; }
+      catch (_) { return { path: nextPath, html: fetched.text }; }
+      const localPath = repoPathFromUrl(targetUrl);
+      if (localPath !== null && /\.(?:html?|xhtml)$/i.test(localPath)) {
+        nextPath = localPath;
+        continue;
+      }
+      // CDNs often send HTML files as plain text when navigated to. Fetch and run those documents instead.
+      try {
+        const external = new URL(targetUrl);
+        if ((external.hostname === 'cdn.jsdelivr.net' || external.hostname === 'fastly.jsdelivr.net' || external.hostname === 'raw.githubusercontent.com') && /\.(?:html?|xhtml)$/i.test(external.pathname)) {
+          const externalHtml = await fetchText(targetUrl, 12000);
+          if (/^(?:\s*<!doctype\s+html|\s*<html\b)/i.test(externalHtml.slice(0, 240))) {
+            return { path: nextPath, html: externalHtml, baseOverride: new URL('.', targetUrl).href };
+          }
+        }
+      } catch (_) { /* Direct navigation remains the fallback for servers that deny cross-origin fetches. */ }
+      // External game pages are opened top-level rather than being blocked inside an iframe.
+      return { redirect: targetUrl, path: nextPath };
+    }
+    throw new Error('This game has too many nested wrapper pages to open safely.');
+  }
+
+  async function launchStandaloneGame(path, gameWindow) {
+    const target = cleanPath(path);
+    try {
+      if (!gameWindow || gameWindow.closed) throw new Error('The browser did not provide a game tab. Allow pop-ups for this launcher and try again.');
+      try { gameWindow.opener = null; } catch (_) {}
+      $('notice').textContent = `Loading ${target} in a standalone tab…`;
+      $('notice').classList.add('show');
+      const result = await resolveGameTarget(target);
+      if (gameWindow.closed) return;
+      if (result.redirect) {
+        gameWindow.location.replace(result.redirect);
+        note(`${target} opened directly in a new tab.`, 3500);
+        return;
+      }
+      const runnableHtml = await prepareStandaloneHtml(result.path, result.html, result.baseOverride || '');
+      writeTabDocument(gameWindow, runnableHtml);
+      note(`${target} opened in a standalone tab.`, 3500);
+    } catch (error) {
+      showTabError(gameWindow, target, error);
+      note(`Could not open ${target}; see the new tab for details.`, 5000);
+    }
+  }
+
   async function loadPath(path, opts = {}) {
     const target = cleanPath(path || 'index.html') || 'index.html';
     if (busy) return;
     lastAttemptedPath = target;
+    if (target !== 'index.html') {
+      const popupName = opts.windowName || '';
+      let gameWindow = null;
+      try { if (popupName) gameWindow = window.open('', popupName); } catch (_) {}
+      if (!gameWindow) {
+        try { gameWindow = window.open('about:blank', popupName || '_blank'); } catch (_) {}
+      }
+      if (!gameWindow) {
+        note('Your browser blocked the new tab. Allow pop-ups for this launcher and click the game again.', 5000);
+        return;
+      }
+      launchStandaloneGame(target, gameWindow);
+      return;
+    }
     busy = true;
     clearError();
     $('retry').disabled = true;
@@ -415,7 +757,7 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
     $('gameBar').classList.toggle('visible', target !== 'index.html');
     if (target === 'index.html') {
       $('gameBar').classList.remove('visible');
-      showLoading('Opening Chicken Kings Vault…', 'Downloading the homepage and its linked CSS and JavaScript files.');
+      showLoading('Opening Chicken Kings Vault…', 'Downloading the homepage and its linked CSS and JavaScript files. Game links will open directly from the repository CDN.');
     } else {
       $('gameBar').classList.add('visible');
       $('gameTitle').textContent = target;
@@ -428,8 +770,7 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
       $('statusText').textContent = `Downloaded ${target}. Discovering linked stylesheets and scripts…`;
       const prepared = await prepareDocument(target, page.text);
       // Page was fully prepared; mount it in a real HTML document, not as a raw GitHub URL.
-      frame.srcdoc = prepared;
-      await new Promise((resolve, reject) => {
+      const frameLoaded = new Promise((resolve, reject) => {
         let settled = false;
         const finish = () => {
           if (settled) return;
@@ -440,10 +781,12 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
         const timeout = setTimeout(() => {
           if (settled) return;
           settled = true;
-          reject(new Error('The page files were fetched, but the app frame did not finish loading.'));
+          reject(new Error('The homepage files were fetched, but the home view did not finish loading.'));
         }, 20000);
         frame.addEventListener('load', finish, { once: true });
       });
+      frame.srcdoc = prepared;
+      await frameLoaded;
       currentPath = target;
       if (opts.push !== false) {
         if (target === 'index.html') stack = [];
@@ -484,9 +827,11 @@ h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin
     if (data.type === 'home') {
       stack = [];
       loadPath('index.html', { push: false });
+    } else if (data.type === 'popup-blocked') {
+      note('The browser blocked the game tab. Allow pop-ups for this launcher, then click the game again.', 5000);
     } else if (data.type === 'navigate' && typeof data.path === 'string') {
       const path = cleanPath(data.path);
-      if (/\.html?$/i.test(path) || path === 'index.html') loadPath(path);
+      if (/\.html?$/i.test(path) || path === 'index.html') loadPath(path, { windowName: data.windowName });
     }
   });
 
