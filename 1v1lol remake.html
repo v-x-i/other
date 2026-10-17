@@ -64,8 +64,11 @@ h1{font-size:clamp(28px,5vw,38px);letter-spacing:-.055em;line-height:1.12;margin
   const rowMap = new Map();
   const blobUrls = new Map();
   let repoVersion = BRANCH;
+  let loadedCommitSha = '';
   let queue = [];
   let busy = false;
+  let checkingForUpdates = false;
+  let updateAvailableSha = '';
   let currentExecuting = '';
   let lastInjectedError = null;
   let noticeTimer = 0;
@@ -121,6 +124,7 @@ h1{font-size:clamp(28px,5vw,38px);letter-spacing:-.055em;line-height:1.12;margin
       if (tree.truncated) throw new Error('GitHub truncated the recursive file tree.');
       if (!Array.isArray(tree.tree)) throw new Error('GitHub did not return a repository file tree.');
       repoVersion = commit.sha;
+      loadedCommitSha = commit.sha;
       return tree.tree.filter(item => item.type === 'blob' && item.path).map(item => item.path);
     } catch (error) { discoveryError = error; }
 
@@ -529,8 +533,72 @@ h1{font-size:clamp(28px,5vw,38px);letter-spacing:-.055em;line-height:1.12;margin
     }
   }
 
+  function showUpdateAvailable(latestSha) {
+    updateAvailableSha = latestSha;
+    let banner = document.getElementById('repoUpdateBanner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'repoUpdateBanner';
+      Object.assign(banner.style, {
+        position: 'fixed', right: '14px', bottom: '14px', zIndex: '2147483647',
+        display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px',
+        maxWidth: 'min(560px, calc(100vw - 28px))', padding: '12px 14px',
+        border: '1px solid #80612f', borderRadius: '13px',
+        background: 'rgba(22,20,20,.97)', color: '#fff1d1',
+        boxShadow: '0 12px 36px #000a', font: '13px/1.45 system-ui, sans-serif'
+      });
+      const message = document.createElement('span');
+      message.id = 'repoUpdateMessage';
+      message.textContent = 'A repository update is available.';
+      Object.assign(message.style, { flex: '1 1 190px' });
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = 'Update now ↻';
+      Object.assign(button.style, {
+        border: '0', borderRadius: '9px', padding: '9px 12px', cursor: 'pointer',
+        font: '700 12px system-ui, sans-serif', color: '#211706',
+        background: 'linear-gradient(135deg,#ffd47b,#e9a932)'
+      });
+      button.addEventListener('click', () => location.reload());
+      banner.append(message, button);
+    }
+    const message = document.getElementById('repoUpdateMessage');
+    if (message) message.textContent = `A new repository version (${latestSha.slice(0, 7)}) is available. Update after this match or click Update now.`;
+    if (!banner.isConnected) document.body.appendChild(banner);
+  }
+
+  async function checkForUpdates() {
+    if (busy || checkingForUpdates || document.visibilityState !== 'visible') return;
+    checkingForUpdates = true;
+    try {
+      const commit = await fetchJson(`${API_ROOT}/commits/${BRANCH}`);
+      const latestSha = commit && commit.sha;
+      if (!latestSha) return;
+      if (loadedCommitSha && latestSha === loadedCommitSha) return;
+      // If the initial commit lookup was unavailable, reload once the API works
+      // again so the next launch can establish a trustworthy version baseline.
+      const hud = document.getElementById('hud');
+      const inMatch = !!(hud && hud.classList.contains('on'));
+      if (inMatch) {
+        if (latestSha !== updateAvailableSha) showUpdateAvailable(latestSha);
+      } else {
+        location.reload();
+      }
+    } catch (_) {
+      // A temporary GitHub/API failure should not interrupt a running game.
+    } finally {
+      checkingForUpdates = false;
+    }
+  }
+
   $('retry').addEventListener('click', launch);
   launch();
+  // Rescan the branch periodically. A changed commit triggers a reload outside
+  // a match; during a match we show an update button so gameplay isn't interrupted.
+  setInterval(checkForUpdates, 60000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') checkForUpdates();
+  });
 })();
 </script>
 </body>
