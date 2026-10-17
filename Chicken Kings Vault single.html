@@ -1,1 +1,525 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0b0d">
+<title>Chicken Kings Vault — GitHub Launcher</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0b0d;--panel:#151519;--text:#f1f1f3;--muted:#a0a0aa;--line:#34343b;--accent:#f5a623;--good:#83e6b1;--bad:#ff8b9a}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+#appFrame{position:fixed;inset:0;width:100%;height:100%;border:0;background:var(--bg);opacity:0;visibility:hidden;transition:opacity .28s ease;z-index:1}
+#appFrame.ready{opacity:1;visibility:visible}
+#loading{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:18px;background:radial-gradient(ellipse at 50% 0%,#3d2c14 0%,#19150e 34%,#0b0b0d 77%);opacity:1;transition:opacity .28s ease,visibility 0s}
+#loading.hidden{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .28s ease,visibility 0s linear .28s}
+.panel{width:min(570px,100%);max-height:calc(100dvh - 24px);overflow:auto;padding:clamp(19px,4vw,30px);border:1px solid #51432b;border-radius:22px;background:linear-gradient(145deg,#211c14f5,#111114f8);box-shadow:0 24px 90px #0009;backdrop-filter:blur(18px)}
+.brand{display:flex;align-items:center;gap:13px;margin-bottom:12px}.logo{width:52px;height:52px;display:grid;place-items:center;border-radius:15px;font-size:28px;background:linear-gradient(145deg,#67451a,#292016);border:1px solid #9b6e29;box-shadow:inset 0 1px #ffffff24}
+h1{font-size:clamp(23px,5vw,31px);letter-spacing:-.045em;line-height:1.12;margin:0}.tag{color:#d1b989;font-size:12px;margin-top:5px}.intro{color:var(--muted);margin:15px 0 18px;font-size:14px}
+.status{padding:14px;border:1px solid var(--line);background:#0a0a0cbf;border-radius:15px}.status-title{display:flex;align-items:center;gap:9px;font-weight:750}.dot{width:8px;height:8px;flex:0 0 auto;border-radius:50%;background:var(--accent);box-shadow:0 0 14px #f5a623aa;animation:pulse 1.4s ease-in-out infinite}.status-text{font-size:12px;color:var(--muted);margin-top:5px;overflow-wrap:anywhere;min-height:18px}
+.file-meter{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:13px;padding:10px 11px;border:1px solid #3f3525;border-radius:11px;background:#100e0b}.file-current{display:flex;flex-direction:column;gap:2px;min-width:0}.file-caption{font-size:9px;font-weight:850;letter-spacing:.14em;color:#a99571}.file-name{font-size:13px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff3d8;max-width:330px}.file-metrics{display:flex;align-items:baseline;gap:10px;flex-shrink:0;font-variant-numeric:tabular-nums}.file-step{font-size:12px;font-weight:750;color:#d4c29f}.file-percent{font-size:18px;font-weight:850;letter-spacing:-.04em;color:#ffc65e;min-width:42px;text-align:right}.bar{height:6px;margin-top:8px;border-radius:99px;background:#30291e;overflow:hidden}.bar span{display:block;height:100%;width:0%;background:linear-gradient(90deg,#bd7a1f,#ffcf70);border-radius:99px;transition:width .2s ease}
+.load-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:13px 2px 7px;color:#9d927f;font-size:9px;font-weight:850;letter-spacing:.12em}.load-head span:last-child{letter-spacing:0;font-variant-numeric:tabular-nums;color:#e7d5b0}.asset-list{display:grid;gap:5px;max-height:155px;overflow:auto;padding:1px 3px 1px 1px;scrollbar-width:thin;scrollbar-color:#56472f transparent}.asset-row{display:grid;grid-template-columns:17px minmax(0,1fr) auto;align-items:center;gap:8px;padding:6px 9px;min-height:28px;border:1px solid transparent;border-radius:9px;background:#0c0c0eaa;color:#9a9aa3;font-size:11px;transition:background .15s,border-color .15s,color .15s}.asset-row .asset-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.asset-row .asset-state{font-size:10px;color:#777781;white-space:nowrap}.asset-row .asset-icon{display:grid;place-items:center;width:16px;height:16px;border-radius:50%;font-size:12px}.asset-row.active{background:#302516;border-color:#8a6126;color:#fff4df}.asset-row.active .asset-icon,.asset-row.active .asset-state{color:#ffca68}.asset-row.done .asset-icon{background:#153c2c;color:var(--good)}.asset-row.done .asset-state{color:var(--good)}.asset-row.failed{background:#351922;border-color:#70303e;color:#ffdae0}.asset-row.failed .asset-icon,.asset-row.failed .asset-state{color:var(--bad)}
+.actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px}button,.button{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border:1px solid transparent;border-radius:11px;background:linear-gradient(135deg,#ffd47b,#e9a932);color:#211706;font:inherit;font-weight:750;text-decoration:none;cursor:pointer;transition:filter .15s,transform .15s}button:hover,.button:hover{filter:brightness(1.08);transform:translateY(-1px)}button:disabled{opacity:.6;cursor:wait;transform:none}button.secondary,.button.secondary{background:#252329;color:#f1eef5;border-color:#44414a}.hint{font-size:11px;color:#898993;margin:14px 0 0}.error{color:#ffc0c7;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:12px}.error[hidden]{display:none}
+#gameBar{position:fixed;z-index:8;top:10px;left:10px;right:10px;display:none;align-items:center;gap:9px;min-height:42px;padding:6px 9px;border:1px solid #4a4336;border-radius:12px;background:#111114eF;box-shadow:0 6px 26px #0007;backdrop-filter:blur(12px)}#gameBar.visible{display:flex}#gameBar button{padding:6px 10px;font-size:12px;border-radius:8px}#gameTitle{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:#e7dfd0;font-weight:700}#gameBar .right{margin-left:auto;display:flex;gap:7px;flex-shrink:0}#notice{position:fixed;right:13px;bottom:13px;z-index:12;max-width:min(390px,calc(100vw - 26px));padding:10px 13px;border:1px solid #554832;border-radius:11px;background:#17140fee;color:#f4e6cb;box-shadow:0 8px 28px #0006;font-size:12px;opacity:0;transform:translateY(7px);pointer-events:none;transition:opacity .2s,transform .2s}#notice.show{opacity:1;transform:translateY(0)}
+@keyframes pulse{0%,100%{opacity:.48;transform:scale(.85)}50%{opacity:1;transform:scale(1.08)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<iframe id="appFrame" title="Chicken Kings Vault" allow="fullscreen; autoplay; clipboard-read; clipboard-write; gamepad"></iframe>
+<div id="gameBar" aria-label="Game navigation"><button id="homeBtn" type="button">← Home</button><span id="gameTitle">Loading game…</span><div class="right"><button id="reloadBtn" class="secondary" type="button">↻ Reload</button><a id="sourceLink" class="button secondary" href="https://github.com/AniItsukiCoded/ChickenKingsVault/tree/main" target="_blank" rel="noopener noreferrer">Repo ↗</a></div></div>
+<div id="loading">
+  <section class="panel" aria-labelledby="title">
+    <div class="brand"><div class="logo">🐔</div><div><h1 id="title">Chicken Kings Vault</h1><div class="tag">Live GitHub repository launcher</div></div></div>
+    <p class="intro">Fetching the real site files from GitHub and starting the website. Game pages are loaded from the repository when you open them.</p>
+    <div class="status" role="status" aria-live="polite"><div class="status-title"><span class="dot" id="dot"></span><span id="statusTitle">Connecting to GitHub…</span></div><div class="status-text" id="statusText">Checking the latest repository version and downloading index.html.</div><div class="file-meter"><div class="file-current"><span class="file-caption">CURRENT FILE</span><span class="file-name" id="currentFile">index.html</span></div><div class="file-metrics"><span class="file-step" id="fileStep">1/1</span><span class="file-percent" id="filePercent">0%</span></div></div><div class="bar" role="progressbar" aria-label="Repository files loaded" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progress"></span></div><div class="load-head"><span>LIVE FILE LOAD</span><span id="assetCount">Preparing…</span></div><div class="asset-list" id="assetList"></div></div>
+    <div class="error" id="error" hidden></div>
+    <div class="actions"><button id="retry" type="button">↻ Try again</button><a class="button secondary" href="https://github.com/AniItsukiCoded/ChickenKingsVault/tree/main" target="_blank" rel="noopener noreferrer">Open source repository ↗</a></div>
+    <p class="hint">Internet access is required. This launcher fetches files from the public <code>main</code> branch and checks for repository updates while open.</p>
+  </section>
+</div>
+<div id="notice" aria-live="polite"></div>
+<script>
+(() => {
+  'use strict';
+  const OWNER = 'AniItsukiCoded';
+  const REPO = 'ChickenKingsVault';
+  const BRANCH = 'main';
+  const API = `https://api.github.com/repos/${OWNER}/${REPO}/commits/${BRANCH}`;
+  const RAW_ORIGIN = 'https://raw.githubusercontent.com';
+  const REPO_PREFIX = `/${OWNER}/${REPO}/`;
+  const CDN_ROOT = `https://cdn.jsdelivr.net/gh/${OWNER}/${REPO}@`;
+  const $ = id => document.getElementById(id);
+  const frame = $('appFrame');
+  let version = BRANCH;
+  let currentPath = 'index.html';
+  let lastAttemptedPath = 'index.html';
+  let currentDocumentTitle = 'Chicken Kings Vault';
+  let stack = [];
+  let busy = false;
+  let noticeTimer = 0;
+  let lastUpdateCheck = 0;
+  let loadedOnce = false;
+  let queue = [];
+  const rowMap = new Map();
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  function pathEncode(path) {
+    return String(path).split('/').map(part => encodeURIComponent(part)).join('/');
+  }
+  function rootFor(v = version) { return `${RAW_ORIGIN}/${OWNER}/${REPO}/${v}/`; }
+  function rawUrl(path, v = version) { return rootFor(v) + pathEncode(path); }
+  function cleanPath(path) {
+    let value = String(path || '').split(/[?#]/, 1)[0].replace(/\\/g, '/');
+    value = value.replace(/^\/+/, '');
+    const parts = [];
+    for (const part of value.split('/')) {
+      if (!part || part === '.') continue;
+      if (part === '..') { if (parts.length) parts.pop(); continue; }
+      parts.push(part);
+    }
+    return parts.join('/');
+  }
+  function isExternal(ref) {
+    return /^(?:[a-z][a-z0-9+.-]*:|\/\/|data:|blob:|#)/i.test(String(ref || '').trim());
+  }
+  function toRepoPathFromUrl(urlString) {
+    try {
+      const u = new URL(urlString);
+      if (u.hostname !== 'raw.githubusercontent.com') return null;
+      const path = decodeURIComponent(u.pathname);
+      if (!path.startsWith(REPO_PREFIX)) return null;
+      let rest = path.slice(REPO_PREFIX.length);
+      if (rest.startsWith('refs/heads/main/')) rest = rest.slice('refs/heads/main/'.length);
+      else {
+        const slash = rest.indexOf('/');
+        if (slash < 0) return rest === version || rest === BRANCH ? 'index.html' : null;
+        const ref = rest.slice(0, slash);
+        if (ref !== version && ref !== BRANCH && ref !== 'main') return null;
+        rest = rest.slice(slash + 1);
+      }
+      return cleanPath(rest || 'index.html');
+    } catch (_) { return null; }
+  }
+  function pathFromReference(ref, baseUrl) {
+    const text = String(ref || '').trim();
+    if (!text || /^(?:data:|blob:|javascript:|mailto:|tel:|#)/i.test(text)) return null;
+    try {
+      if (text.startsWith('/') && !text.startsWith('//')) return cleanPath(text);
+      const u = new URL(text, baseUrl);
+      const known = toRepoPathFromUrl(u.href);
+      if (known !== null) return known;
+      if (u.origin === RAW_ORIGIN && u.pathname.startsWith(REPO_PREFIX)) return null;
+      if (!/^https?:$/i.test(u.protocol)) return null;
+      return null;
+    } catch (_) { return null; }
+  }
+  function dirUrlFor(path) {
+    const normalized = cleanPath(path);
+    const cut = normalized.lastIndexOf('/');
+    return rootFor() + (cut < 0 ? '' : pathEncode(normalized.slice(0, cut + 1)));
+  }
+  function fileUrlFor(path) { return rawUrl(cleanPath(path)); }
+
+  async function fetchText(url, timeoutMs = 16000) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, { cache: 'no-store', signal: controller.signal, headers: { 'Accept': 'text/plain,text/html,application/javascript,text/css,*/*;q=0.8' } });
+      if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
+      const text = await response.text();
+      if (/^(?:<!doctype\s+html|<html\b)/i.test(text.trimStart().slice(0, 180)) && /\.(?:css|js|mjs)$/i.test(new URL(url).pathname)) {
+        throw new Error(`GitHub returned an HTML error page instead of the requested file: ${url}`);
+      }
+      return text;
+    } finally { clearTimeout(timeout); }
+  }
+  async function fetchRepoText(path) {
+    const p = cleanPath(path);
+    if (!p) throw new Error('The repository file path was empty.');
+    const urls = [rawUrl(p), `${RAW_ORIGIN}/${OWNER}/${REPO}/refs/heads/main/${pathEncode(p)}`, `${CDN_ROOT}${encodeURIComponent(version)}/${pathEncode(p)}`];
+    const attempts = urls.map(url => fetchText(url).then(text => ({ text, url })));
+    try { return await Promise.any(attempts); }
+    catch (error) {
+      const messages = error && error.errors ? error.errors.map(e => e?.message).filter(Boolean) : [];
+      throw new Error(`Could not fetch ${p}. ${messages.slice(0, 2).join(' | ') || 'GitHub and CDN requests failed.'}`);
+    }
+  }
+  async function getLatestVersion() {
+    lastUpdateCheck = Date.now();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5500);
+    try {
+      const response = await fetch(API, { cache: 'no-store', signal: controller.signal, headers: { 'Accept': 'application/vnd.github+json' } });
+      if (!response.ok) throw new Error(`GitHub API HTTP ${response.status}`);
+      const data = await response.json();
+      return data.sha || BRANCH;
+    } finally { clearTimeout(timeout); }
+  }
+
+  function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[ch]);
+  }
+  function addQueueFile(path, state = 'queued') {
+    const p = cleanPath(path);
+    if (!p) return;
+    let row = rowMap.get(p);
+    if (!row) {
+      row = document.createElement('div');
+      row.className = 'asset-row';
+      row.dataset.path = p;
+      row.innerHTML = `<span class="asset-icon">○</span><span class="asset-name"></span><span class="asset-state">Queued</span>`;
+      row.querySelector('.asset-name').textContent = p;
+      $('assetList').appendChild(row);
+      rowMap.set(p, row);
+      queue.push(p);
+    }
+    setFileState(p, state);
+    updateMeter();
+  }
+  function setFileState(path, state, detail) {
+    const p = cleanPath(path);
+    const row = rowMap.get(p);
+    if (!row) return;
+    row.classList.remove('active', 'done', 'failed');
+    if (state === 'active') row.classList.add('active');
+    if (state === 'done') row.classList.add('done');
+    if (state === 'failed') row.classList.add('failed');
+    row.querySelector('.asset-icon').textContent = state === 'done' ? '✓' : state === 'failed' ? '!' : state === 'active' ? '◌' : '○';
+    row.querySelector('.asset-state').textContent = detail || (state === 'done' ? 'Ready' : state === 'failed' ? 'Failed' : state === 'active' ? 'Loading' : 'Queued');
+    updateMeter();
+  }
+  function resetQueue(firstPath) {
+    queue = [];
+    rowMap.clear();
+    $('assetList').replaceChildren();
+    addQueueFile(firstPath, 'active');
+    $('statusText').textContent = `Fetching ${firstPath} from GitHub.`;
+  }
+  function updateMeter() {
+    const rows = queue.map(path => ({ path, row: rowMap.get(path) })).filter(x => x.row);
+    if (!rows.length) return;
+    const done = rows.filter(x => x.row.classList.contains('done')).length;
+    const failed = rows.filter(x => x.row.classList.contains('failed')).length;
+    let current = rows.find(x => x.row.classList.contains('active')) || rows.find(x => !x.row.classList.contains('done') && !x.row.classList.contains('failed')) || rows[rows.length - 1];
+    const percent = Math.round(done / rows.length * 100);
+    $('currentFile').textContent = current.path;
+    $('currentFile').title = current.path;
+    $('fileStep').textContent = `${Math.min(rows.length, rows.indexOf(current) + 1)}/${rows.length}`;
+    $('filePercent').textContent = `${percent}%`;
+    $('progress').style.width = `${percent}%`;
+    $('progress').parentElement.setAttribute('aria-valuenow', String(percent));
+    $('assetCount').textContent = `${done}/${rows.length} files ready${failed ? ` · ${failed} failed` : ''}`;
+    $('assetList').querySelector('.asset-row.active')?.scrollIntoView({ block: 'nearest' });
+  }
+  function showLoading(title, message) {
+    $('loading').classList.remove('hidden');
+    $('statusTitle').textContent = title;
+    $('statusText').textContent = message;
+  }
+  function hideLoading() {
+    $('loading').classList.add('hidden');
+    frame.classList.add('ready');
+  }
+  function showError(message) {
+    $('error').hidden = false;
+    $('error').textContent = message;
+    $('dot').style.background = 'var(--bad)';
+    $('dot').style.boxShadow = '0 0 14px #ff8b9a99';
+    $('statusTitle').textContent = 'Could not load the repository';
+  }
+  function clearError() {
+    $('error').hidden = true;
+    $('error').textContent = '';
+    $('dot').style.background = 'var(--accent)';
+    $('dot').style.boxShadow = '0 0 14px #f5a623aa';
+  }
+  function note(message, duration = 3000) {
+    $('notice').textContent = message;
+    $('notice').classList.add('show');
+    clearTimeout(noticeTimer);
+    noticeTimer = setTimeout(() => $('notice').classList.remove('show'), duration);
+  }
+
+  function patchRootPaths(doc) {
+    // Files beginning with / in a GitHub Pages app usually mean repo-root paths.
+    for (const el of doc.querySelectorAll('[href],[src],[poster],[data]')) {
+      for (const attr of ['href','src','poster','data']) {
+        if (!el.hasAttribute(attr)) continue;
+        const val = el.getAttribute(attr).trim();
+        if (val.startsWith('/') && !val.startsWith('//')) {
+          const normalized = cleanPath(val);
+          el.setAttribute(attr, rawUrl(normalized || 'index.html'));
+        }
+      }
+    }
+  }
+  function ensureHomeCompatibility(doc) {
+    // Current source app.js references these optional panels although index.html omits them.
+    if (!doc.getElementById('tag-filters')) {
+      const tags = doc.createElement('div');
+      tags.id = 'tag-filters';
+      tags.hidden = true;
+      (doc.querySelector('.controls-bar') || doc.body).appendChild(tags);
+    }
+    if (!doc.getElementById('for-you')) {
+      const suggestion = doc.createElement('section');
+      suggestion.id = 'for-you';
+      suggestion.hidden = true;
+      const row = doc.createElement('div');
+      row.id = 'suggestions-row';
+      suggestion.appendChild(row);
+      const footer = doc.querySelector('.site-footer');
+      if (footer) footer.before(suggestion); else doc.body.appendChild(suggestion);
+    } else if (!doc.getElementById('suggestions-row')) {
+      const row = doc.createElement('div'); row.id = 'suggestions-row'; doc.getElementById('for-you').appendChild(row);
+    }
+  }
+  function resolveCssUrl(value, cssPath) {
+    const v = String(value || '').trim();
+    if (!v || /^(?:data:|blob:|https?:|\/\/|#|var\()/i.test(v)) return v;
+    try {
+      if (v.startsWith('/')) return rawUrl(cleanPath(v));
+      return new URL(v, fileUrlFor(cssPath)).href;
+    } catch (_) { return v; }
+  }
+  async function inlineCssImports(css, cssPath, depth = 0) {
+    if (depth > 4) return css;
+    const pattern = /@import\s+(?:url\(\s*)?(["']?)([^"'\s)]+)\1\s*\)?\s*([^;]*);/gi;
+    let output = '';
+    let cursor = 0;
+    const matches = [...css.matchAll(pattern)];
+    for (const match of matches) {
+      output += css.slice(cursor, match.index);
+      const url = match[2];
+      const media = (match[3] || '').trim();
+      const importPath = pathFromReference(url, fileUrlFor(cssPath));
+      if (importPath) {
+        try {
+          const fetched = await fetchRepoText(importPath);
+          addQueueFile(importPath, 'active');
+          const imported = await inlineCssImports(fetched.text, importPath, depth + 1);
+          setFileState(importPath, 'done', 'Ready');
+          output += media ? `@media ${media}{${imported}}` : imported;
+        } catch (_) {
+          output += match[0];
+        }
+      } else output += match[0];
+      cursor = match.index + match[0].length;
+    }
+    output += css.slice(cursor);
+    return output;
+  }
+  async function prepareCss(css, cssPath) {
+    let result = await inlineCssImports(css, cssPath);
+    result = result.replace(/url\(\s*("|')?([^"')]+)\1\s*\)/gi, (all, quote, value) => {
+      const resolved = resolveCssUrl(value, cssPath);
+      return `url("${resolved.replace(/"/g, '%22')}")`;
+    });
+    return result.replace(/<\/style/gi, '<\\/style');
+  }
+  function rewriteModuleImports(source, scriptPath) {
+    const scriptUrl = fileUrlFor(scriptPath);
+    let output = source.replace(/\bimport\.meta\.url\b/g, JSON.stringify(scriptUrl));
+    // Inline module files need their relative static/dynamic imports anchored to their original path.
+    output = output.replace(/(\bfrom\s*|\bimport\s*\(|^\s*import\s*)(["'])(\.{1,2}\/[^"']+)\2/gm, (all, lead, quote, spec) => {
+      try { return lead + quote + new URL(spec, scriptUrl).href + quote; } catch (_) { return all; }
+    });
+    return output;
+  }
+  function routeRuntime() {
+    const rawRoot = rootFor();
+    return `(()=>{\n'use strict';\nconst ROOT=${JSON.stringify(rawRoot)};\nconst PREFIX=${JSON.stringify(REPO_PREFIX)};\nconst VERSION=${JSON.stringify(version)};\nfunction pathFrom(u){try{const x=new URL(u,document.baseURI);if(x.hostname!=='raw.githubusercontent.com')return null;const p=decodeURIComponent(x.pathname);if(!p.startsWith(PREFIX))return null;let r=p.slice(PREFIX.length);if(r.startsWith('refs/heads/main/'))r=r.slice('refs/heads/main/'.length);else{const i=r.indexOf('/');if(i<0)return 'index.html';const ref=r.slice(0,i);if(ref!==VERSION&&ref!=='main')return null;r=r.slice(i+1);}return r||'index.html';}catch(e){return null;}}\ndocument.addEventListener('click',e=>{const a=e.target&&e.target.closest?e.target.closest('a[href]'):null;if(!a||e.defaultPrevented||a.hasAttribute('download')||a.target&&a.target!=='_self')return;const href=a.getAttribute('href')||'';if(href.startsWith('#')&&href!=='#ckv-home')return;const u=href==='#ckv-home'?ROOT+'index.html':new URL(href,document.baseURI).href;const p=pathFrom(u);if(p===null)return;if(!/\\.(?:html?|xhtml)$/i.test(p)&&p!=='index.html')return;e.preventDefault();e.stopPropagation();parent.postMessage({__chickenKingsVault:1,type:'navigate',path:p},'*');},true);\nwindow.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.baseURI!==ROOT)parent.postMessage({__chickenKingsVault:1,type:'home'},'*');});\n})();`;
+  }
+
+  async function prepareDocument(path, html) {
+    const normalizedPath = cleanPath(path || 'index.html');
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    if (!doc.head || !doc.body) throw new Error(`${normalizedPath} does not contain a complete HTML document.`);
+    const base = doc.createElement('base');
+    base.href = dirUrlFor(normalizedPath);
+    const oldBase = doc.querySelector('base');
+    if (oldBase) oldBase.replaceWith(base); else doc.head.prepend(base);
+    patchRootPaths(doc);
+    const isHome = normalizedPath === 'index.html';
+    if (isHome) ensureHomeCompatibility(doc);
+
+    const cssTasks = [...doc.querySelectorAll('link[rel~="stylesheet"][href]')].map(async node => {
+      const ref = node.getAttribute('href');
+      const localPath = pathFromReference(ref, dirUrlFor(normalizedPath));
+      if (localPath === null) return;
+      addQueueFile(localPath, 'active');
+      try {
+        const fetched = await fetchRepoText(localPath);
+        const contents = await prepareCss(fetched.text, localPath);
+        const style = doc.createElement('style');
+        style.dataset.sourceFile = localPath;
+        style.textContent = contents;
+        node.replaceWith(style);
+        setFileState(localPath, 'done', 'Ready');
+      } catch (error) {
+        setFileState(localPath, 'failed', 'Failed');
+        throw error;
+      }
+    });
+
+    const scriptTasks = [...doc.querySelectorAll('script[src]')].map(async node => {
+      const ref = node.getAttribute('src');
+      const localPath = pathFromReference(ref, dirUrlFor(normalizedPath));
+      if (localPath === null) return;
+      addQueueFile(localPath, 'active');
+      try {
+        const fetched = await fetchRepoText(localPath);
+        let contents = fetched.text;
+        const type = (node.getAttribute('type') || '').trim().toLowerCase();
+        if (type === 'module') contents = rewriteModuleImports(contents, localPath);
+        // Avoid a source-script navigation bypass on the repository's built-in random-game card.
+        if (isHome && /(?:^|\/)assets\/app\.js$/i.test(localPath)) {
+          contents = contents.replace(/window\.location\.href\s*=\s*random\.href\s*;/g,
+            "window.parent.postMessage({__chickenKingsVault:1,type:'navigate',path:random.href},'*');");
+        }
+        node.removeAttribute('src');
+        node.removeAttribute('async');
+        node.removeAttribute('defer');
+        node.dataset.sourceFile = localPath;
+        node.textContent = contents.replace(/<\/script/gi, '<\\/script');
+        setFileState(localPath, 'done', 'Ready');
+      } catch (error) {
+        setFileState(localPath, 'failed', 'Failed');
+        throw error;
+      }
+    });
+    await Promise.all([...cssTasks, ...scriptTasks]);
+
+    // Add the link router after site scripts so clicks to repository HTML files are fetched as HTML,
+    // rather than navigated to raw.githubusercontent.com as plain-text documents.
+    const runtime = doc.createElement('script');
+    runtime.dataset.launcherRouter = 'true';
+    runtime.textContent = routeRuntime().replace(/<\/script/gi, '<\\/script');
+    doc.body.appendChild(runtime);
+
+    // Put the repository path in the title and preserve the site's own markup and styling.
+    if (isHome) currentDocumentTitle = doc.title || 'Chicken Kings Vault';
+    return '<!doctype html>\n' + doc.documentElement.outerHTML;
+  }
+
+  async function loadPath(path, opts = {}) {
+    const target = cleanPath(path || 'index.html') || 'index.html';
+    if (busy) return;
+    lastAttemptedPath = target;
+    busy = true;
+    clearError();
+    $('retry').disabled = true;
+    frame.classList.remove('ready');
+    $('gameBar').classList.toggle('visible', target !== 'index.html');
+    if (target === 'index.html') {
+      $('gameBar').classList.remove('visible');
+      showLoading('Opening Chicken Kings Vault…', 'Downloading the homepage and its linked CSS and JavaScript files.');
+    } else {
+      $('gameBar').classList.add('visible');
+      $('gameTitle').textContent = target;
+      showLoading('Loading game page…', `Fetching ${target} and its required files from GitHub.`);
+    }
+    resetQueue(target);
+    try {
+      const page = await fetchRepoText(target);
+      setFileState(target, 'done', 'Downloaded');
+      $('statusText').textContent = `Downloaded ${target}. Discovering linked stylesheets and scripts…`;
+      const prepared = await prepareDocument(target, page.text);
+      // Page was fully prepared; mount it in a real HTML document, not as a raw GitHub URL.
+      frame.srcdoc = prepared;
+      await new Promise((resolve, reject) => {
+        let settled = false;
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeout);
+          resolve();
+        };
+        const timeout = setTimeout(() => {
+          if (settled) return;
+          settled = true;
+          reject(new Error('The page files were fetched, but the app frame did not finish loading.'));
+        }, 20000);
+        frame.addEventListener('load', finish, { once: true });
+      });
+      currentPath = target;
+      if (opts.push !== false) {
+        if (target === 'index.html') stack = [];
+        else if (stack[stack.length - 1] !== target) stack.push(target);
+      }
+      $('gameBar').classList.toggle('visible', target !== 'index.html');
+      $('gameTitle').textContent = target;
+      $('statusTitle').textContent = 'Website loaded';
+      $('statusText').textContent = `${target} is running from repository files at commit ${version === BRANCH ? 'main' : version.slice(0, 7)}.`;
+      // Keep a tiny completion beat so 100% is visible instead of flashing past.
+      await sleep(250);
+      hideLoading();
+      if (target === 'index.html') document.title = 'Chicken Kings Vault — Live Launcher';
+      else document.title = `${target.split('/').pop()} — Chicken Kings Vault`;
+      loadedOnce = true;
+    } catch (error) {
+      $('loading').classList.remove('hidden');
+      showError(`${error && error.message ? error.message : String(error)}\n\nCheck your internet connection. If GitHub is temporarily rate-limiting requests, use Try again in a moment.`);
+      $('statusText').textContent = 'The source files could not all be fetched. No raw source page was opened.';
+      $('assetList').querySelectorAll('.asset-row').forEach(row => {
+        if (!row.classList.contains('done') && !row.classList.contains('failed')) {
+          row.classList.add('failed');
+          row.querySelector('.asset-icon').textContent = '!';
+          row.querySelector('.asset-state').textContent = 'Stopped';
+        }
+      });
+      updateMeter();
+      if (loadedOnce) frame.classList.add('ready');
+    } finally {
+      busy = false;
+      $('retry').disabled = false;
+    }
+  }
+
+  window.addEventListener('message', event => {
+    if (event.source !== frame.contentWindow || !event.data || event.data.__chickenKingsVault !== 1) return;
+    const data = event.data;
+    if (data.type === 'home') {
+      stack = [];
+      loadPath('index.html', { push: false });
+    } else if (data.type === 'navigate' && typeof data.path === 'string') {
+      const path = cleanPath(data.path);
+      if (/\.html?$/i.test(path) || path === 'index.html') loadPath(path);
+    }
+  });
+
+  $('homeBtn').addEventListener('click', () => {
+    stack = [];
+    loadPath('index.html', { push: false });
+  });
+  $('reloadBtn').addEventListener('click', () => loadPath(currentPath, { push: false }));
+  $('retry').addEventListener('click', () => loadPath(lastAttemptedPath || currentPath || 'index.html', { push: false }));
+
+  async function checkForUpdates() {
+    if (busy || document.visibilityState !== 'visible' || Date.now() - lastUpdateCheck < 90000) return;
+    try {
+      const latest = await getLatestVersion();
+      if (latest && latest !== version && latest !== BRANCH) {
+        version = latest;
+        note('Repository update found. Reloading the current page…', 4500);
+        await loadPath(currentPath, { push: false });
+      }
+    } catch (_) { /* Leave the running version alone when the update API is unavailable. */ }
+  }
+
+  (async () => {
+    try {
+      version = await getLatestVersion();
+    } catch (_) {
+      version = BRANCH;
+    }
+    await loadPath('index.html', { push: false });
+  })();
+  setInterval(checkForUpdates, 95000);
+  document.addEventListener('visibilitychange', checkForUpdates);
+})();
+</script>
+</body>
+</html>
